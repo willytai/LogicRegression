@@ -1,0 +1,41 @@
+CSRCS = $(wildcard *.cpp)
+CHDRS = $(wildcard *.h)
+COBJS = $(addsuffix .o, $(basename $(CSRCS)))
+
+DEPENDDIR = -I.
+
+CXX   = g++
+CCC   = gcc
+AR    = ar cr
+ECHO  = /bin/echo
+
+TARGET = ../bin/$(EXEC)
+
+DEBUG_FLAGS =
+
+#Og optimizes debug experience
+CFLAGS = -O3 -Wall
+CFLAGS = -Og -Wall -g $(DEBUG_FLAGS)
+
+
+.PHONY: depend
+
+all: $(COBJS)
+	@$(ECHO) "> building -> $(EXEC) ..."
+	@$(CXX) $(CFLAGS) $(COBJS) -o $(TARGET)
+
+%.o: %.cpp
+	@$(ECHO) "> compiling: $< ..."
+	@$(CXX) $(CFLAGS) -c -o $@ $<
+
+clean:
+	@rm -rf $(COBJS)
+	@rm -rf $(TARGET)
+
+## Make dependencies
+depend: .depend.mak
+.depend.mak: $(CSRCS) $(CHDRS)
+	@$(ECHO) Making dependencies ...
+	@$(CXX) -MM $(DEPENDDIR) $(CSRCS) > $@
+
+include .depend.mak
