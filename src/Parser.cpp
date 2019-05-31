@@ -47,11 +47,22 @@ void Mgr::ReadIORelation(std::string filename) {
 
     _relation_in.clear();
     _relation_out.clear();
+    _relation_in.resize(_numInput);
+    _relation_out.resize(_numOutput);
 
     int numRelation;
     std::ifstream file;
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
+    int TotalPat = numRelation / UnitPatSize;
+    #ifdef PARALLEL
+    #pragma omp parallel for
+    #endif
+    for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(TotalPat);
+    #ifdef PARALLEL
+    #pragma omp parallel for
+    #endif
+    for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(TotalPat);
 
     std::vector<std::string> variableNames;
     std::string buffer;
@@ -61,7 +72,7 @@ void Mgr::ReadIORelation(std::string filename) {
     }
 
     int relCount = 0;
-    std::vector<Pat> temp; temp.resize((_numInput + _numOutput), 0);
+    std::vector<Pat> temp((_numInput + _numOutput), 0);
     while (relCount < numRelation) {
         for (int i = 0; i < (int)temp.size(); ++i) {
             temp[i] = temp[i] << 1;
@@ -75,11 +86,11 @@ void Mgr::ReadIORelation(std::string filename) {
                 if (it == _input_variable_name_id_map.end()) {
                     it = _output_variable_name_id_map.find(variableNames[i]);
                     VariableID id = (*it).second;
-                    _relation_out[id].push_back(temp[i]);
+                    _relation_out[id][relCount/64-1] = temp[i];
                 }
                 else {
                     VariableID id = (*it).second;
-                    _relation_in[id].push_back(temp[i]);
+                    _relation_in[id][relCount/64-1] = temp[i];
                 }
             }
         }
@@ -87,13 +98,14 @@ void Mgr::ReadIORelation(std::string filename) {
 
     /*
     for (int i = 0; i < _relation_in.size(); ++i) {
-        cout << ((_relation_in[i][1]&2)>>1) << ' ';
+        cout << (_relation_in[i].back() & MASK) << ' ';
     }
     cout << endl;
     for (int i = 0; i < _relation_out.size(); ++i) {
-        cout << ((_relation_out[i][1]&2)>>1) << ' ';
+        cout << (_relation_out[i].back() & MASK) << ' ';
     }
     cout << endl;
+    exit(0);
     */
 }
 

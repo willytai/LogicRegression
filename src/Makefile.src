@@ -15,7 +15,7 @@ DEBUG_FLAGS =
 
 #Og optimizes debug experience
 CFLAGS = -Og -Wall -g $(DEBUG_FLAGS)
-CFLAGS = -O3 -Wall
+CFLAGS = -O3 -Wall -DPARALLEL -fopenmp
 
 
 .PHONY: depend

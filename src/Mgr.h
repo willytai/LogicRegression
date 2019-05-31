@@ -14,6 +14,10 @@
 #include <limits>
 #include <iomanip>
 
+#ifdef PARALLEL
+#include <omp.h>
+#endif
+
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
 #define MIN_ENUMERATE_VAR_NUM 6

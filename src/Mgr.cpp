@@ -86,7 +86,7 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
     // cout << _output[PO_id]._name << "'s entropy: " << PO_entropy << endl;
 
     // calculate the information gain of each input
-    std::vector<std::pair<double, VariableID> > info_gain; info_gain.resize(_input.size());
+    std::vector<std::pair<double, VariableID> > info_gain(_input.size());
     for (int child_id = 0; child_id < (int)info_gain.size(); ++child_id) {
         const std::vector<Pat>& PI_pat = _relation_in[child_id];
         double p_child_p = 0.0, p_child_n = 0.0, n_child_p = 0.0, n_child_n = 0.0;
