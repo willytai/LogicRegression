@@ -9,20 +9,39 @@ namespace LogicRegression
 {
 
 void Mgr::GenPattern() {
-    cout << "[Mgr]    Generating " << _numInput*UnitPatSize*60 << " relations to calculate information gain" << endl;
-    this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*60);
+    int initPatNumFactor = 10;
+    cout << "[Mgr]    Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
+    this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*initPatNumFactor);
     this->RunIOGen();
     this->ReadIORelation();
 
     std::vector<std::vector<Pat> > refinedPatternIn;
     std::vector<std::vector<Pat> > refinedPatternOut;
 
+#ifdef PARALLEL
+    cout << "[Mgr]    Generating patterns with multi-threading ..." << endl;
+#pragma omp parallel
+{
+    std::vector<std::vector<Pat> > privateRefinedPatternIn;
+    #pragma omp for nowait
+    for (int i = 0; i < (int)_output.size(); ++i) {
+        std::vector<std::pair<double, VariableID> > info;
+        this->CalInfoGain(i, info);
+        this->refinePattern(privateRefinedPatternIn, info);
+        this->removeDuplicates(privateRefinedPatternIn);
+    }
+    #pragma omp critical
+    cout << "[Mgr]    thread " << omp_get_thread_num() << " joining..." << endl;
+    refinedPatternIn.insert(refinedPatternIn.end(), privateRefinedPatternIn.begin(), privateRefinedPatternIn.end());
+}
+#else
     for (int i = 0; i < (int)_output.size(); ++i) {
         std::vector<std::pair<double, VariableID> > info;
         this->CalInfoGain(i, info);
         this->refinePattern(refinedPatternIn, info);
         this->removeDuplicates(refinedPatternIn);
     }
+#endif
     this->WritePattern(refinedPatternIn);
     this->RunIOGen();
     this->ReadIORelation();
@@ -67,8 +86,10 @@ void Mgr::RunIOGen() const {
 }
 
 void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
+#ifndef PARALLEL
     cout << endl;
     cout << "[Mgr]    Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
+#endif
     assert(PO_id < (int)_output.size());
 
     // calculate entropy for the corresponding output
@@ -91,9 +112,6 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
 
     // calculate the information gain of each input
     std::vector<std::pair<double, VariableID> > info_gain(_input.size());
-#ifdef PARALLEL
-#pragma omp parallel for
-#endif
     for (int child_id = 0; child_id < (int)info_gain.size(); ++child_id) {
         const std::vector<Pat>& PI_pat = _relation_in[child_id];
         double p_child_p = 0.0, p_child_n = 0.0, n_child_p = 0.0, n_child_n = 0.0;
@@ -157,7 +175,9 @@ void Mgr::refinePattern
         }
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
+#ifndef PARALLEL
     cout << "[Mgr]    Number of chosen input variables: " << partition_index;
+#endif
     // cout << " (";
     // for (int i = 0; i < partition_index; ++i) {
     //     cout << _input[info[i].second]._name;
@@ -204,7 +224,9 @@ void Mgr::refinePattern
     }
     if (curPatCount % UnitPatSize) refinedPatternIn.push_back(temp_pat);
 
+#ifndef PARALLEL
     cout << ", " << curPatCount << " refined patterns generated" << endl;
+#endif
 }
 
 void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {
