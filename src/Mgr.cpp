@@ -1,6 +1,9 @@
 #include "Mgr.h"
+#include "myUsage.h"
 
 static Pattern::Generator Gen;
+
+extern MyUsage usg;
 
 namespace LogicRegression
 {
@@ -71,6 +74,7 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
     // calculate entropy for the corresponding output
     const std::vector<Pat>& PO_pat = _relation_out[PO_id];
     double PO_entropy, positive = 0.0, negative = 0.0;
+
     for (int i = 0; i < (int)PO_pat.size(); ++i) {
         for (int j = 0; j < UnitPatSize; ++j) {
             if ( (PO_pat[i] >> j) & MASK ) ++positive;
@@ -87,6 +91,9 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
 
     // calculate the information gain of each input
     std::vector<std::pair<double, VariableID> > info_gain(_input.size());
+#ifdef PARALLEL
+#pragma omp parallel for
+#endif
     for (int child_id = 0; child_id < (int)info_gain.size(); ++child_id) {
         const std::vector<Pat>& PI_pat = _relation_in[child_id];
         double p_child_p = 0.0, p_child_n = 0.0, n_child_p = 0.0, n_child_n = 0.0;

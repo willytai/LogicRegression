@@ -55,13 +55,7 @@ void Mgr::ReadIORelation(std::string filename) {
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
     int TotalPat = numRelation / UnitPatSize;
-    #ifdef PARALLEL
-    #pragma omp parallel for
-    #endif
     for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(TotalPat);
-    #ifdef PARALLEL
-    #pragma omp parallel for
-    #endif
     for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(TotalPat);
 
     std::vector<std::string> variableNames;
