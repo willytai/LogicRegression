@@ -11,6 +11,7 @@
 #define my_random  random
 
 typedef size_t Pat;
+#define UnitPatSize 64
 
 namespace Pattern
 {

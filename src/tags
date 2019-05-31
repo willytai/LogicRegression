@@ -1,0 +1,88 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CalEntropy	Mgr.cpp	/^void Mgr::CalEntropy(const int PO_id) {$/;"	f	class:LogicRegression::Mgr
+CalInfoGain	Mgr.cpp	/^void Mgr::CalInfoGain(const int PO_id) {$/;"	f	class:LogicRegression::Mgr
+CalInfoGain	Mgr.cpp	/^void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {$/;"	f	class:LogicRegression::Mgr
+Gen	Mgr.cpp	/^static Pattern::Generator Gen;$/;"	v	file:
+GenPattern	Mgr.cpp	/^void Mgr::GenPattern() {$/;"	f	class:LogicRegression::Mgr
+GenerateInputPattern	Mgr.cpp	/^void Mgr::GenerateInputPattern(std::string filename, int numPat) {$/;"	f	class:LogicRegression::Mgr
+Generator	RandPatGen.h	/^    Generator() { my_srandom(getpid()); }$/;"	f	class:Pattern::Generator
+Generator	RandPatGen.h	/^    Generator(unsigned seed) { my_srandom(seed); }$/;"	f	class:Pattern::Generator
+Generator	RandPatGen.h	/^class Generator$/;"	c	namespace:Pattern
+GetMemUsage	myUsage.cpp	/^double MyUsage::GetMemUsage() {$/;"	f	class:MyUsage
+GetMgr	Mgr.h	/^inline Mgr& GetMgr() { return Mgr::get_instance(); }$/;"	f	namespace:LogicRegression
+GetTimeUsage	myUsage.cpp	/^double MyUsage::GetTimeUsage() {$/;"	f	class:MyUsage
+LogicRegression	Mgr.cpp	/^namespace LogicRegression$/;"	n	file:
+LogicRegression	Mgr.h	/^namespace LogicRegression$/;"	n
+LogicRegression	Parser.cpp	/^namespace LogicRegression$/;"	n	file:
+LogicRegression	Variable.h	/^namespace LogicRegression$/;"	n
+MASK	Mgr.h	16;"	d
+MASK	Mgr.h	17;"	d
+MAX_ENUMERATE_VAR_NUM	Mgr.h	17;"	d
+MAX_ENUMERATE_VAR_NUM	Mgr.h	18;"	d
+MAX_PATTERN_NUM	Mgr.h	20;"	d
+MIN_ENUMERATE_VAR_NUM	Mgr.h	18;"	d
+MIN_ENUMERATE_VAR_NUM	Mgr.h	19;"	d
+MYCLK_TCK	myUsage.h	21;"	d
+MYCLK_TCK	myUsage.h	22;"	d
+MY_USAGE_H	myUsage.h	10;"	d
+Mgr	Mgr.h	/^    Mgr() {}$/;"	f	class:LogicRegression::Mgr
+Mgr	Mgr.h	/^class Mgr$/;"	c	namespace:LogicRegression
+MyUsage	myUsage.h	/^   MyUsage() { reset(); }$/;"	f	class:MyUsage
+MyUsage	myUsage.h	/^class MyUsage$/;"	c
+Pat	RandPatGen.h	/^typedef size_t Pat;$/;"	t
+Pattern	RandPatGen.h	/^namespace Pattern$/;"	n
+ReadIOGen	Parser.cpp	/^void Mgr::ReadIOGen(char* filename) {$/;"	f	class:LogicRegression::Mgr
+ReadIOInfo	Parser.cpp	/^void Mgr::ReadIOInfo(char* filename) {$/;"	f	class:LogicRegression::Mgr
+ReadIORelation	Parser.cpp	/^void Mgr::ReadIORelation(std::string filename) {$/;"	f	class:LogicRegression::Mgr
+RunIOGen	Mgr.cpp	/^void Mgr::RunIOGen() const {$/;"	f	class:LogicRegression::Mgr
+RunIOGen	Mgr.cpp	/^void Mgr::RunIOGen() {$/;"	f	class:LogicRegression::Mgr
+SetID	Variable.h	/^    void SetID(VariableID i) { _id = i; }$/;"	f	struct:LogicRegression::Variable
+SetName	Variable.h	/^    void SetName(std::string s) { _name = s; }$/;"	f	struct:LogicRegression::Variable
+UnitPatSize	RandPatGen.h	14;"	d
+Variable	Variable.h	/^    Variable() {}$/;"	f	struct:LogicRegression::Variable
+Variable	Variable.h	/^    Variable(std::string s) { _name = s; }$/;"	f	struct:LogicRegression::Variable
+Variable	Variable.h	/^struct Variable$/;"	s	namespace:LogicRegression
+VariableID	Variable.h	/^typedef int VariableID;$/;"	t	namespace:LogicRegression
+WritePattern	Mgr.cpp	/^void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn) {$/;"	f	class:LogicRegression::Mgr
+WritePattern	Mgr.cpp	/^void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, std::string filename) const {$/;"	f	class:LogicRegression::Mgr
+__MGR_H__	Mgr.h	2;"	d
+__PATTERN_GEN_H__	RandPatGen.h	2;"	d
+__VARIABLE_H__	Variable.h	2;"	d
+_currentMem	myUsage.h	/^   double     _currentMem;$/;"	m	class:MyUsage
+_currentTick	myUsage.h	/^   double     _currentTick;$/;"	m	class:MyUsage
+_id	Variable.h	/^    VariableID  _id;$/;"	m	struct:LogicRegression::Variable
+_initMem	myUsage.h	/^   double     _initMem;$/;"	m	class:MyUsage
+_input	Mgr.h	/^    std::vector<Variable>  _input;$/;"	m	class:LogicRegression::Mgr
+_input_variable_name_id_map	Mgr.h	/^    std::map<std::string, VariableID>  _input_variable_name_id_map;$/;"	m	class:LogicRegression::Mgr
+_iogen	Mgr.h	/^    std::string            _iogen;$/;"	m	class:LogicRegression::Mgr
+_name	Variable.h	/^    std::string _name;$/;"	m	struct:LogicRegression::Variable
+_numInput	Mgr.h	/^    int                    _numInput;$/;"	m	class:LogicRegression::Mgr
+_numOutput	Mgr.h	/^    int                    _numOutput;$/;"	m	class:LogicRegression::Mgr
+_output	Mgr.h	/^    std::vector<Variable>  _output;$/;"	m	class:LogicRegression::Mgr
+_output_variable_name_id_map	Mgr.h	/^    std::map<std::string, VariableID>  _output_variable_name_id_map;$/;"	m	class:LogicRegression::Mgr
+_periodUsedTime	myUsage.h	/^   double     _periodUsedTime;$/;"	m	class:MyUsage
+_relation_in	Mgr.h	/^    std::vector<std::vector<Pat> > _relation_in;$/;"	m	class:LogicRegression::Mgr
+_relation_out	Mgr.h	/^    std::vector<std::vector<Pat> > _relation_out;$/;"	m	class:LogicRegression::Mgr
+_totalUsedTime	myUsage.h	/^   double     _totalUsedTime;$/;"	m	class:MyUsage
+checkMem	myUsage.h	/^   double checkMem() const {$/;"	f	class:MyUsage
+checkTick	myUsage.h	/^   double checkTick() const {$/;"	f	class:MyUsage
+get_instance	Mgr.h	/^    static Mgr& get_instance() { static Mgr m; return m; }$/;"	f	class:LogicRegression::Mgr
+main	main.cpp	/^int main(int argc, char *argv[])$/;"	f
+my_random	RandPatGen.h	11;"	d
+my_srandom	RandPatGen.h	10;"	d
+operator ()	RandPatGen.h	/^    int operator () (const int range) const { \/\/ generate int from [0 range-1]$/;"	f	class:Pattern::Generator
+operator ()	RandPatGen.h	/^    void operator () (std::vector<Pat>& patterns) {$/;"	f	class:Pattern::Generator
+refinePattern	Mgr.cpp	/^void Mgr::refinePattern$/;"	f	class:LogicRegression::Mgr
+removeDuplicates	Mgr.cpp	/^void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {$/;"	f	class:LogicRegression::Mgr
+report	myUsage.cpp	/^void MyUsage::report(bool repTime, bool repMem) {$/;"	f	class:MyUsage
+reset	myUsage.h	/^   void reset() {$/;"	f	class:MyUsage
+setMemUsage	myUsage.h	/^   void setMemUsage() { _currentMem = checkMem() - _initMem; }$/;"	f	class:MyUsage
+setTimeUsage	myUsage.h	/^   void setTimeUsage() {$/;"	f	class:MyUsage
+usg	main.cpp	/^MyUsage usg;$/;"	v
+~Mgr	Mgr.h	/^    ~Mgr() {}$/;"	f	class:LogicRegression::Mgr
+~Variable	Variable.h	/^    ~Variable() {}$/;"	f	struct:LogicRegression::Variable

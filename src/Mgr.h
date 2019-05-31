@@ -8,8 +8,16 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <cmath>
+#include <cassert>
+#include <algorithm>
+#include <limits>
+#include <iomanip>
 
 #define MASK 0x1
+#define MAX_ENUMERATE_VAR_NUM 10
+#define MIN_ENUMERATE_VAR_NUM 6
+#define MAX_PATTERN_NUM 5000000
 
 using std::cout;
 using std::endl;
@@ -26,15 +34,26 @@ public:
 
     static Mgr& get_instance() { static Mgr m; return m; }
 
-    // for parser
+    /**********/
+    /* Top API */
+    /**********/
     void ReadIOInfo     (char*);
     void ReadIOGen      (char*);
-    void ReadIORelation (std::string filename = "io_rel.txt");
+    void GenPattern     ();
 
-    // IO for gnenrator
+    /********************/
+    /* IO for gnenrator */
+    /********************/
+    // random generate
     void GenerateInputPattern(std::string filename = "in_pat.txt", int numPat = 64);
+    // write specified patterns to file
+    void WritePattern(const std::vector<std::vector<Pat> >&, std::string filename = "in_pat.txt") const;
+    void ReadIORelation (std::string filename = "io_rel.txt");
+    void RunIOGen() const;
 
-    void RunIOGen();
+    void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
+    void refinePattern(std::vector<std::vector<Pat> >&, const std::vector<std::pair<double, VariableID> >&);
+    void removeDuplicates(std::vector<std::vector<Pat> >&);
 
 private:
     std::vector<Variable>  _input;

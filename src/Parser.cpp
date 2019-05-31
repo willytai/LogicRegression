@@ -42,6 +42,12 @@ void Mgr::ReadIOGen(char* filename) {
 }
 
 void Mgr::ReadIORelation(std::string filename) {
+
+    cout << "[Parser] Reading IO relation ..." << endl;
+
+    _relation_in.clear();
+    _relation_out.clear();
+
     int numRelation;
     std::ifstream file;
     file.open(filename.c_str());

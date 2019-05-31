@@ -14,8 +14,8 @@ TARGET = ../bin/$(EXEC)
 DEBUG_FLAGS =
 
 #Og optimizes debug experience
-CFLAGS = -O3 -Wall
 CFLAGS = -Og -Wall -g $(DEBUG_FLAGS)
+CFLAGS = -O3 -Wall
 
 
 .PHONY: depend

@@ -1,5 +1,8 @@
 #include "Mgr.h"
+#include "myUsage.h"
 #include <cstdlib>
+
+MyUsage usg;
 
 int main(int argc, char *argv[])
 {
@@ -8,11 +11,11 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    usg.reset();
     LogicRegression::GetMgr().ReadIOInfo(argv[1]);
     LogicRegression::GetMgr().ReadIOGen(argv[2]);
-    LogicRegression::GetMgr().GenerateInputPattern("in_pat.txt", 64);
-    LogicRegression::GetMgr().RunIOGen();
-    LogicRegression::GetMgr().ReadIORelation();
+    LogicRegression::GetMgr().GenPattern();
 
+    usg.report(1, 1);
     return 0;
 }
