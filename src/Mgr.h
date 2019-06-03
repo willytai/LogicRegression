@@ -63,7 +63,7 @@ public:
 	void findingDCinput();
 
 	//Generate PLA file for abc
-	void GeneratePLA(std::string filename = "pat.pla");
+	void GenerateBLIF(std::string filename = "pat.blif");
 
 private:
     std::vector<Variable>  _input;
