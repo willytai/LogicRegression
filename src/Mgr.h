@@ -58,6 +58,8 @@ public:
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(std::vector<std::vector<Pat> >&, const std::vector<std::pair<double, VariableID> >&);
 
+	void GeneratePLA(std::string filename = "pat.pla");
+
 private:
     std::vector<Variable>  _input;
     std::vector<Variable>  _output;
