@@ -61,9 +61,11 @@ public:
 	//finding identical output pattern and generate don't care term
 	//TODO : change std::map into self defined hash map in Mgr.cpp
 	void findingDCinput();
+    void removeDuplicates(std::vector<std::vector<Pat> >&);
 
 	//Generate PLA file for abc
 	void GenerateBLIF(std::string filename = "pat.blif");
+	void GeneratePLA(std::string filename = "pat.blif");
 
 private:
     std::vector<Variable>  _input;

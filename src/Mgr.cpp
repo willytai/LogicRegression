@@ -21,6 +21,7 @@ void Mgr::GenPattern() {
         std::vector<std::pair<double, VariableID> > info;
         this->CalInfoGain(i, info);
         this->refinePattern(refinedPatternIn, info);
+        this->removeDuplicates(refinedPatternIn);
     }
     this->WritePattern(refinedPatternIn);
     this->RunIOGen();
@@ -201,6 +202,13 @@ void Mgr::refinePattern
     if (curPatCount % UnitPatSize) refinedPatternIn.push_back(temp_pat);
 
     cout << ", " << curPatCount << " refined patterns generated" << endl;
+}
+
+void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {
+    // implememnt this by hashing!
+    // use STL bitset
+    // disabled by now
+    return;
 }
 
 void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, std::string filename) const {
