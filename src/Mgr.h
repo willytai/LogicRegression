@@ -57,7 +57,6 @@ public:
 
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(std::vector<std::vector<Pat> >&, const std::vector<std::pair<double, VariableID> >&);
-    void removeDuplicates(std::vector<std::vector<Pat> >&);
 
 private:
     std::vector<Variable>  _input;

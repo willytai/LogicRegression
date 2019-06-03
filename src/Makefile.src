@@ -13,6 +13,7 @@ TARGET = ../bin/$(EXEC)
 
 DEBUG_FLAGS =
 
+CONTRAOL_FLAGS = 
 CONTRAOL_FLAGS = -DPARALLEL
 
 #Og optimizes debug experience
