@@ -16,7 +16,7 @@ directory:
 			echo "Directory exists."; \
 		fi; \
 	done
-	@cd src; make -f Makefile.src --no-print-directory EXEC=$(EXEC);
+	@cd src; make -j4 -f Makefile.src --no-print-directory EXEC=$(EXEC);
 	@ln -fs bin/$(EXEC)
 
 clean:
