@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <limits>
 #include <iomanip>
+#include <bitset>
 
 #ifdef PARALLEL
 #include <omp.h>
@@ -57,7 +58,11 @@ public:
 
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(std::vector<std::vector<Pat> >&, const std::vector<std::pair<double, VariableID> >&);
+	//finding identical output pattern and generate don't care term
+	//TODO : change std::map into self defined hash map in Mgr.cpp
+	void findingDCinput();
 
+	//Generate PLA file for abc
 	void GeneratePLA(std::string filename = "pat.pla");
 
 private:
@@ -72,6 +77,8 @@ private:
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
+	//TODO : output2input_map should be a self defined hash map
+	std::map<std::string, std::string> output2input_map;
 };
 
 inline Mgr& GetMgr() { return Mgr::get_instance(); }

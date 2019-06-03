@@ -232,5 +232,58 @@ void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, s
     }
     file.close();
 }
-
+void Mgr::findingDCinput() {
+	cout << "[Mgr]    finding identical output" << endl;
+	size_t pattern_num = _relation_in[0].size();
+	for (size_t i = 0; i < pattern_num; i++){
+		std::vector<std::bitset<64> > inputPattern;
+		std::vector<std::bitset<64> > outputPattern;
+		/* transfer input_pattern & output_pattern into 64 bits bitset object */
+		for (int j = 0; j < _numInput; j++){
+			std::bitset<64> b(_relation_in[j][i]);
+			inputPattern.push_back(b);	
+		}
+		for (int j = 0; j < _numOutput; j++){
+			std::bitset<64> b(_relation_out[j][i]);
+			outputPattern.push_back(b);
+		}
+		for (int k = 0; k < 64; k++){
+			/* transfer pattern into a sequence of input pattern corresponding to output pattern */
+			std::string b_in;
+			std::string b_out;
+			for(int j = 0; j < _numInput; j++){
+				char t;
+				if (inputPattern[j][k] == 0) t = '0';
+				else t = '1';
+				b_in.push_back(t);
+			}
+			for (int j = 0; j < _numOutput; j++){
+				char t;
+				if (outputPattern[j][k] == 0) t = '0';
+				else t = '1';
+				b_out.push_back(t);
+			}
+			/* use stl::map to find identical output pattern */
+			/* TODO */
+			/* change the function used by output2input_map into equivalent function in self defined hash map */
+			std::map< std::string, std::string>::iterator  mapIter;
+			mapIter = output2input_map.find(b_out);
+			/* if b_out is not in output2input_map, insert the pair(b_out, b_in) */
+			if(mapIter == output2input_map.end())
+				output2input_map.insert(std::make_pair(b_out, b_in));
+			else {
+			/* if b_out is already in output2input_map
+			 * get the corresponding input pattern and compare it with b_in to generate don't care input */
+				std::string str = output2input_map[b_out];
+				for (int i = 0; i < _numInput; i++){
+					if(str[i] != b_in[i]) {
+						str[i] = '-';
+					}
+				}
+				output2input_map[b_out] = str;
+			}
+		}	
+	}
+}
+/* end of namespace */
 }
