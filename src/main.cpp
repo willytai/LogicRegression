@@ -15,8 +15,9 @@ int main(int argc, char *argv[])
     LogicRegression::GetMgr().ReadIOInfo(argv[1]);
     LogicRegression::GetMgr().ReadIOGen(argv[2]);
     LogicRegression::GetMgr().GenPattern();
-	LogicRegression::GetMgr().findingDCinput();
-	LogicRegression::GetMgr().GenerateBLIF();
+	// LogicRegression::GetMgr().findingDCinput();
+	// LogicRegression::GetMgr().GenerateBLIF();
+    LogicRegression::GetMgr().GeneratePLA();
 
     usg.report(1, 1);
     return 0;

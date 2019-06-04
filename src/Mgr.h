@@ -23,6 +23,7 @@
 #define MAX_ENUMERATE_VAR_NUM 10
 #define MIN_ENUMERATE_VAR_NUM 6
 #define MAX_PATTERN_NUM 5000000
+#define HASH_SIZE 1000000
 
 using std::cout;
 using std::endl;
@@ -45,6 +46,7 @@ public:
     void ReadIOInfo     (char*);
     void ReadIOGen      (char*);
     void GenPattern     ();
+    void RunABC         ();
 
     /********************/
     /* IO for gnenrator */
@@ -65,7 +67,7 @@ public:
 
 	//Generate PLA file for abc
 	void GenerateBLIF(std::string filename = "pat.blif");
-	void GeneratePLA(std::string filename = "pat.blif");
+	void GeneratePLA(std::string filename = "pat.pla");
 
 private:
     std::vector<Variable>  _input;

@@ -1,7 +1,8 @@
 #include "Mgr.h"
 #include "myUsage.h"
+#include "myHashSet.h"
 
-static Pattern::Generator Gen;
+static Pattern::Generator Gen(101011387);
 
 extern MyUsage usg;
 
@@ -9,20 +10,20 @@ namespace LogicRegression
 {
 
 void Mgr::GenPattern() {
-    int initPatNumFactor = 10;
+    int initPatNumFactor = 20;
     cout << "[Mgr]    Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
     this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*initPatNumFactor);
     this->RunIOGen();
     this->ReadIORelation();
 
-    std::vector<std::vector<Pat> > refinedPatternIn;
+    std::vector<std::vector<Pat> > refinedPatternIn; // [batch num][input index]
 
     for (int i = 0; i < (int)_output.size(); ++i) {
         std::vector<std::pair<double, VariableID> > info;
         this->CalInfoGain(i, info);
         this->refinePattern(refinedPatternIn, info);
-        this->removeDuplicates(refinedPatternIn);
     }
+    this->removeDuplicates(refinedPatternIn);
     this->WritePattern(refinedPatternIn);
     this->RunIOGen();
     this->ReadIORelation();
@@ -155,11 +156,6 @@ void Mgr::refinePattern
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
     cout << "[Mgr]    Number of chosen input variables: " << partition_index;
-    // cout << " (";
-    // for (int i = 0; i < partition_index; ++i) {
-    //     cout << _input[info[i].second]._name;
-    //     if (i < partition_index - 1) cout << ' ';
-    // } cout << "), ";
 
     // enumerate the chosen variables
     std::vector<Pat> temp_pat(_numInput, 0x0);
@@ -177,7 +173,7 @@ void Mgr::refinePattern
         }
 
         // random generate patterns for each enumearted pattern
-        int randPatCount = (_numInput-chosenVarNum)*UnitPatSize/4;
+        int randPatCount = (_numInput-chosenVarNum)*1;
         if (!randPatCount) randPatCount = 1;
         for (int k = 0; k < randPatCount; ++k) {
             ++curPatCount;
@@ -205,9 +201,36 @@ void Mgr::refinePattern
 }
 
 void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {
+    // disable for now
+    return;
     // implememnt this by hashing!
-    // use STL bitset
-    // disabled by now
+    std::vector<string> patterns;
+    cout << "[Mgr]    Removing duplicated patterns, before: " << patterns.size() << " after: "; 
+    for (int i = 0; i < (int)refinedPatternIn.size(); ++i) {
+        for (int patCount = 0; patCount < UnitPatSize; ++patCount) {
+            patterns.resize( patterns.size() + 1 );
+            patterns.back().resize(_numInput);
+            for (int k = 0; k < _numInput; ++k) {
+                int string_idx = _numInput - 1 - k;
+                int value = ( refinedPatternIn[i][k] >> patCount ) & MASK;
+                if (value) patterns.back()[string_idx] = '1';
+                else       patterns.back()[string_idx] = '0';
+            }
+        }
+    }
+
+    Hash myhash(HASH_SIZE);
+    for (int i = 0; i < (int)patterns.size(); ++i) {
+        if (!myhash.insert(patterns[i])) {
+            std::swap(patterns[i], patterns.back());
+            patterns.pop_back();
+            --i;
+        }
+    }
+
+    for (int i = 0; i < (int)patterns.size(); ++i) cout << patterns[i] << endl;
+    cout << patterns.size() << endl;
+
     return;
 }
 
@@ -240,6 +263,7 @@ void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, s
     }
     file.close();
 }
+
 void Mgr::findingDCinput() {
 	cout << "[Mgr]    finding identical output" << endl;
 	size_t pattern_num = _relation_in[0].size();

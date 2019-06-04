@@ -17,8 +17,8 @@ CONTRAOL_FLAGS =
 CONTRAOL_FLAGS = -DPARALLEL
 
 #Og optimizes debug experience
-CFLAGS = -Og -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
 CFLAGS = -O3 -Wall -fopenmp $(CONTRAOL_FLAGS)
+CFLAGS = -Og -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
 
 
 .PHONY: depend
