@@ -46,7 +46,7 @@ public:
     void ReadIOInfo     (char*);
     void ReadIOGen      (char*);
     void GenPattern     ();
-    void RunABC         ();
+    void RunABC         (const std::string filename = "pat.pla");
 
     /********************/
     /* IO for gnenrator */
@@ -83,6 +83,12 @@ private:
     std::map<std::string, VariableID>  _output_variable_name_id_map;
 	//TODO : output2input_map should be a self defined hash map
 	std::map<std::string, std::string> output2input_map;
+
+	// ABC frame work
+	inline void AbcError(const char* command) {
+        cerr << "Cannot execute command \"" << command << "\"" << endl;
+        exit(-1);
+    }
 };
 
 inline Mgr& GetMgr() { return Mgr::get_instance(); }

@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 	// LogicRegression::GetMgr().findingDCinput();
 	// LogicRegression::GetMgr().GenerateBLIF();
     LogicRegression::GetMgr().GeneratePLA();
+    LogicRegression::GetMgr().RunABC();
 
     usg.report(1, 1);
     return 0;

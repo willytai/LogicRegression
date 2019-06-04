@@ -16,6 +16,8 @@ DEBUG_FLAGS =
 CONTRAOL_FLAGS = 
 CONTRAOL_FLAGS = -DPARALLEL
 
+ABCFLAG = ../lib/libabc.a -lm -ldl -lreadline -lpthread
+
 #Og optimizes debug experience
 CFLAGS = -O3 -Wall -fopenmp $(CONTRAOL_FLAGS)
 CFLAGS = -Og -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
@@ -25,7 +27,7 @@ CFLAGS = -Og -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
 
 all: $(COBJS)
 	@$(ECHO) "> building -> $(EXEC) ..."
-	@$(CXX) $(CFLAGS) $(COBJS) -o $(TARGET)
+	@$(CXX) $(CFLAGS) -o $(TARGET) $(COBJS) $(ABCFLAG)
 
 %.o: %.cpp
 	@$(ECHO) "> compiling: $< ..."
