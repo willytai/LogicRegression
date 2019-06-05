@@ -69,6 +69,7 @@ void Mgr::RunABC(const std::string filename) {
     cout << "************************************************" << endl;
     cout << "*             ABC Frame Work End               *" << endl;
     cout << "************************************************" << endl;
+    Abc_Stop();
 }
 
 }
