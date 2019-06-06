@@ -46,7 +46,11 @@ public:
     void ReadIOInfo     (char*);
     void ReadIOGen      (char*);
     void GenPattern     ();
-    void RunABC         (const std::string filename = "pat.pla");
+	void InitABC		();
+    void ReadPLAABC     (const std::string filename = "pat.pla");
+	void SynthesisABC	();
+	void TechMapABC		();
+	void EndABC			();
 
     /********************/
     /* IO for gnenrator */
