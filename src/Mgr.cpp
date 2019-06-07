@@ -1,9 +1,7 @@
 #include "Mgr.h"
 #include "myUsage.h"
-#include "myHashSet.h"
 
-static Pattern::Generator Gen(101011387);
-
+extern Pattern::Generator Gen;
 extern MyUsage usg;
 
 namespace LogicRegression
@@ -16,15 +14,15 @@ void Mgr::GenPattern() {
     this->RunIOGen();
     this->ReadIORelation();
 
-    std::vector<std::vector<Pat> > refinedPatternIn; // [batch num][input index]
+    PatternBank patBank;
 
     for (int i = 0; i < (int)_output.size(); ++i) {
         std::vector<std::pair<double, VariableID> > info;
         this->CalInfoGain(i, info);
-        this->refinePattern(refinedPatternIn, info);
+        this->refinePattern(patBank, info);
     }
-    this->removeDuplicates(refinedPatternIn);
-    this->WritePattern(refinedPatternIn);
+    patBank.random_sample();
+    this->WritePattern(patBank);
     this->RunIOGen();
     this->ReadIORelation();
 }
@@ -139,7 +137,7 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
 }
 
 void Mgr::refinePattern
-(std::vector<std::vector<Pat> >& refinedPatternIn, const std::vector<std::pair<double, VariableID> >& info) {
+(PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {
 
     // find best partition
     int partition_index = info.size();
@@ -155,167 +153,25 @@ void Mgr::refinePattern
         }
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
-    cout << "[Mgr]    Number of chosen input variables: " << partition_index;
+    cout << "[Mgr]    Number of chosen input variables: " << partition_index << endl;
+    cout << "[Mgr]    Enumerating and combining patterns ..." << endl;
 
-    // enumerate the chosen variables
-    std::vector<Pat> temp_pat(_numInput, 0x0);
-    std::vector<bool> ex_map; ex_map.resize(_numInput, false);
-    int curPatCount = 0;
     const int& chosenVarNum = partition_index;
-    for (int i = 0; i < (1 << chosenVarNum); ++i) {
-        // create base
-        std::vector<bool> base(_numInput, 0);
-        for (int j = chosenVarNum-1; j >= 0; --j) {
+    for (int i = 0; i < ( 1 << chosenVarNum ); ++i) {
+        std::string pattern(_numInput, 'X');
+        int patternKey = 0;
+        for (int j = 0; j < chosenVarNum; ++j) {
             bool   tmp = ( ( i >> (j) ) & MASK );
-            int bit_id = info[chosenVarNum-1-j].second;
-            base[bit_id]   = tmp;
-            ex_map[bit_id] = true;
+            int in_id  = info[partition_index-1-j].second;
+            pattern[in_id] = ( tmp ? '1' : '0' );
+            patternKey += tmp;
         }
-
-        // random generate patterns for each enumearted pattern
-        int randPatCount = (_numInput-chosenVarNum)*1;
-        if (!randPatCount) randPatCount = 1;
-        for (int k = 0; k < randPatCount; ++k) {
-            ++curPatCount;
-            std::vector<bool> newPat(base);
-            for (int j = 0; j < _numInput; ++j) {
-                if (ex_map[j]) continue;
-                newPat[j] = Gen(2);
-            }
-
-            // pack pattern
-            for (int varID = 0; varID < _numInput; ++varID) {
-                temp_pat[varID] = temp_pat[varID] << 1;
-                temp_pat[varID] += (Pat)newPat[varID];
-            }
-            if (curPatCount % UnitPatSize == 0) {
-                refinedPatternIn.push_back(temp_pat);
-                std::vector<Pat> newContainer(temp_pat.size(), 0x0);
-                temp_pat.swap(newContainer);
-            }
-        }
+        patBank.insert(pattern);
     }
-    if (curPatCount % UnitPatSize) refinedPatternIn.push_back(temp_pat);
-
-    cout << ", " << curPatCount << " refined patterns generated" << endl;
 }
 
-void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {
-    // disable for now
-    return;
-    // implememnt this by hashing!
-    std::vector<string> patterns;
-    cout << "[Mgr]    Removing duplicated patterns, before: " << patterns.size() << " after: "; 
-    for (int i = 0; i < (int)refinedPatternIn.size(); ++i) {
-        for (int patCount = 0; patCount < UnitPatSize; ++patCount) {
-            patterns.resize( patterns.size() + 1 );
-            patterns.back().resize(_numInput);
-            for (int k = 0; k < _numInput; ++k) {
-                int string_idx = _numInput - 1 - k;
-                int value = ( refinedPatternIn[i][k] >> patCount ) & MASK;
-                if (value) patterns.back()[string_idx] = '1';
-                else       patterns.back()[string_idx] = '0';
-            }
-        }
-    }
-
-    Hash myhash(HASH_SIZE);
-    for (int i = 0; i < (int)patterns.size(); ++i) {
-        if (!myhash.insert(patterns[i])) {
-            std::swap(patterns[i], patterns.back());
-            patterns.pop_back();
-            --i;
-        }
-    }
-
-    for (int i = 0; i < (int)patterns.size(); ++i) cout << patterns[i] << endl;
-    cout << patterns.size() << endl;
-
-    return;
+void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {
 }
 
-void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, std::string filename) const {
-    cout << "[Mgr]    Writing " << 64*refinedPatternIn.size() << " refiend patterns to file ..." << endl;
-    std::ofstream file;
-    file.open(filename.c_str());
-
-    if ( !file.is_open() ) {
-        cout << "[WritePattern]    Cannot create input file: " << filename << " for " << _iogen << endl;
-        exit(-1);
-    }
-
-    file << _numInput << ' ' << 64*refinedPatternIn.size() << endl;
-    for (int i = 0; i < _numInput; ++i) {
-        file << _input[i]._name;
-        if (i < (int)_input.size()-1) file << ' ';
-    }
-    file << endl;
-
-    for (int batch = 0; batch < (int)refinedPatternIn.size(); ++batch) {
-        for (int bit_id = UnitPatSize-1; bit_id >= 0; --bit_id) {
-            for (int varID = 0; varID < (int)refinedPatternIn[batch].size(); ++varID) {
-                const Pat& curPat = refinedPatternIn[batch][varID];
-                file << ( ( curPat >> bit_id ) & MASK );
-                if (varID < _numInput - 1) file << ' ';
-            }
-            file << endl;
-        }
-    }
-    file.close();
-}
-
-void Mgr::findingDCinput() {
-	cout << "[Mgr]    finding identical output" << endl;
-	size_t pattern_num = _relation_in[0].size();
-	for (size_t i = 0; i < pattern_num; i++){
-		std::vector<std::bitset<64> > inputPattern;
-		std::vector<std::bitset<64> > outputPattern;
-		/* transfer input_pattern & output_pattern into 64 bits bitset object */
-		for (int j = 0; j < _numInput; j++){
-			std::bitset<64> b(_relation_in[j][i]);
-			inputPattern.push_back(b);	
-		}
-		for (int j = 0; j < _numOutput; j++){
-			std::bitset<64> b(_relation_out[j][i]);
-			outputPattern.push_back(b);
-		}
-		for (int k = 0; k < 64; k++){
-			/* transfer pattern into a sequence of input pattern corresponding to output pattern */
-			std::string b_in;
-			std::string b_out;
-			for(int j = 0; j < _numInput; j++){
-				char t;
-				if (inputPattern[j][k] == 0) t = '0';
-				else t = '1';
-				b_in.push_back(t);
-			}
-			for (int j = 0; j < _numOutput; j++){
-				char t;
-				if (outputPattern[j][k] == 0) t = '0';
-				else t = '1';
-				b_out.push_back(t);
-			}
-			/* use stl::map to find identical output pattern */
-			/* TODO */
-			/* change the function used by output2input_map into equivalent function in self defined hash map */
-			std::map< std::string, std::string>::iterator  mapIter;
-			mapIter = output2input_map.find(b_out);
-			/* if b_out is not in output2input_map, insert the pair(b_out, b_in) */
-			if(mapIter == output2input_map.end())
-				output2input_map.insert(std::make_pair(b_out, b_in));
-			else {
-			/* if b_out is already in output2input_map
-			 * get the corresponding input pattern and compare it with b_in to generate don't care input */
-				std::string str = output2input_map[b_out];
-				for (int i = 0; i < _numInput; i++){
-					if(str[i] != b_in[i]) {
-						str[i] = '-';
-					}
-				}
-				output2input_map[b_out] = str;
-			}
-		}	
-	}
-}
 /* end of namespace */
 }

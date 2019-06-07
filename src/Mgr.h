@@ -2,6 +2,7 @@
 #define __MGR_H__
 
 #include "Variable.h"
+#include "patternBank.h"
 #include "RandPatGen.h"
 #include <vector>
 #include <map>
@@ -58,16 +59,12 @@ public:
     // random generate
     void GenerateInputPattern(std::string filename = "in_pat.txt", int numPat = 64);
     // write specified patterns to file
-    void WritePattern(const std::vector<std::vector<Pat> >&, std::string filename = "in_pat.txt") const;
+    void WritePattern(const PatternBank&, std::string filename = "in_pat.txt") const;
     void ReadIORelation (std::string filename = "io_rel.txt");
     void RunIOGen() const;
 
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
-    void refinePattern(std::vector<std::vector<Pat> >&, const std::vector<std::pair<double, VariableID> >&);
-	//finding identical output pattern and generate don't care term
-	//TODO : change std::map into self defined hash map in Mgr.cpp
-	void findingDCinput();
-    void removeDuplicates(std::vector<std::vector<Pat> >&);
+    void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
 	//Generate PLA file for abc
 	void GenerateBLIF(std::string filename = "pat.blif");

@@ -2,6 +2,7 @@
 #include "myUsage.h"
 #include <cstdlib>
 
+Pattern::Generator Gen(101011387);
 MyUsage usg;
 
 int main(int argc, char *argv[])
