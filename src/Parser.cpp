@@ -55,6 +55,7 @@ void Mgr::ReadIORelation(std::string filename) {
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
     int TotalPat = numRelation / UnitPatSize;
+    if (numRelation%UnitPatSize) ++TotalPat;
     for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(TotalPat);
     for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(TotalPat);
 
@@ -74,21 +75,40 @@ void Mgr::ReadIORelation(std::string filename) {
             file >> value;
             temp[i] += value;
         }
-        if (++relCount % 64 == 0) {
+        if (++relCount % UnitPatSize == 0) {
             for (int i = 0; i < (int)temp.size(); ++i) {
                 std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
                 if (it == _input_variable_name_id_map.end()) {
                     it = _output_variable_name_id_map.find(variableNames[i]);
                     VariableID id = (*it).second;
-                    _relation_out[id][relCount/64-1] = temp[i];
+                    _relation_out[id][relCount/UnitPatSize-1] = temp[i];
                 }
                 else {
                     VariableID id = (*it).second;
-                    _relation_in[id][relCount/64-1] = temp[i];
+                    _relation_in[id][relCount/UnitPatSize-1] = temp[i];
                 }
+            }
+            temp.clear();
+            temp.resize((_numInput + _numOutput), 0);
+        }
+    }
+
+    if ( relCount % UnitPatSize != 0 ) {
+        for (int i = 0; i < (int)temp.size(); ++i) {
+            std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
+            if (it == _input_variable_name_id_map.end()) {
+                it = _output_variable_name_id_map.find(variableNames[i]);
+                VariableID id = (*it).second;
+                _relation_out[id][relCount/UnitPatSize] = temp[i];
+            }
+            else {
+                VariableID id = (*it).second;
+                _relation_in[id][relCount/UnitPatSize] = temp[i];
             }
         }
     }
+
+    _numPat = numRelation;
 
     /*
     for (int i = 0; i < _relation_in.size(); ++i) {

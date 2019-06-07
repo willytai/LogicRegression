@@ -78,6 +78,7 @@ private:
     std::string            _iogen;
     int                    _numInput;
     int                    _numOutput;
+    int                    _numPat;
 
     std::vector<std::vector<Pat> > _relation_in;
     std::vector<std::vector<Pat> > _relation_out;
