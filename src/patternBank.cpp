@@ -17,7 +17,7 @@ namespace LogicRegression
      std::vector<std::string> sample;
      for (int i = 0; i < (int)_patterns.size(); ++i) {
         int unkown = this->count_X(_patterns[i]);
-        int expand_num = ( unkown == 0 ? 0 : std::log10( std::pow(2, unkown) ) / std::log10( 1.1 ) );
+        int expand_num = ( unkown == 0 ? 1 : std::log10( std::pow(2, unkown) ) / std::log10( 1.1 ) );
         cout << "sampling " << expand_num << " patterns with " << unkown << "unkown inputs" << endl;
         for (int j = 0; j < expand_num; ++j) {
            std::string newPat(_patterns[i]);
@@ -29,7 +29,7 @@ namespace LogicRegression
         }
      }
      _patterns.swap(sample);
-     exit(0);
+     cout << "[PatBank] " << size() << " patterns sampled." << endl;
    }
 
    void PatternBank::insert(const std::string& pattern) {
@@ -74,6 +74,16 @@ namespace LogicRegression
            if (pat[i] == 'X') ++count;
        }
        return count;
+   }
+
+   void PatternBank::WritePattern(std::ofstream& os) const {
+      for (int i = 0; i < (int)_patterns.size(); ++i) {
+         for (int bit = 0; bit < (int)_patterns[i].size(); ++bit) {
+            os << _patterns[i][bit];
+            if (bit < (int)_patterns[i].size()-1) os << ' ';
+         }
+         os << endl;
+      }
    }
 
    void PatternBank::visualize(status stat, std::string s1, std::string s2) {

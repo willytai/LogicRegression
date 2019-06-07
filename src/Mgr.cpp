@@ -168,9 +168,19 @@ void Mgr::refinePattern
         }
         patBank.insert(pattern);
     }
+    cout << "[Mgr]    " << patBank.size() << " base patterns generated." << endl;
 }
 
 void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {
+    std::ofstream file;
+    file.open(filename.c_str());
+    file << _numInput << ' ' << patBank.size() << endl;
+    for (int i = 0; i < _numInput; ++i) {
+        file << _input[i]._name;
+        if (i < _numInput-1) file << ' ';
+    }
+    file << endl;
+    patBank.WritePattern(file);
 }
 
 /* end of namespace */

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 namespace LogicRegression
 {
@@ -20,7 +21,9 @@ public:
     void   visualize(status, std::string, std::string);
     void   show() const;
     void   random_sample();
+    void   WritePattern(std::ofstream&) const;
     int    count_X(const std::string&);
+    int    size() const { return _patterns.size(); }
     status check_stat(const std::string&, const std::string&);
 
 private:

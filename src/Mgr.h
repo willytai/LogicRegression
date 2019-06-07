@@ -23,8 +23,6 @@
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
 #define MIN_ENUMERATE_VAR_NUM 6
-#define MAX_PATTERN_NUM 5000000
-#define HASH_SIZE 1000000
 
 using std::cout;
 using std::endl;
@@ -82,8 +80,6 @@ private:
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
-	//TODO : output2input_map should be a self defined hash map
-	std::map<std::string, std::string> output2input_map;
 
 	// ABC frame work
 	inline void AbcError(const char* command) {
