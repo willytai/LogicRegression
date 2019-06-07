@@ -39,34 +39,38 @@ public:
 
     static Mgr& get_instance() { static Mgr m; return m; }
 
-    /**********/
+    /***********/
     /* Top API */
-    /**********/
+    /***********/
     void ReadIOInfo     (char*);
     void ReadIOGen      (char*);
     void GenPattern     ();
-	void InitABC		();
+    void RunAbc         ();
+
+    /*******************/
+    /* Abc's procedure */
+    /*******************/
+    void InitABC        ();
     void ReadPLAABC     (const std::string filename = "pat.pla");
-	void SynthesisABC	();
-	void TechMapABC		();
-	void EndABC			();
+    void SynthesisABC   ();
+    void TechMapABC     ();
+    void EndABC         ();
 
     /********************/
     /* IO for gnenrator */
     /********************/
     // random generate
     void GenerateInputPattern(std::string filename = "in_pat.txt", int numPat = 64);
-    // write specified patterns to file
-    void WritePattern(const PatternBank&, std::string filename = "in_pat.txt") const;
-    void ReadIORelation (std::string filename = "io_rel.txt");
-    void RunIOGen() const;
+    void WritePattern        (const PatternBank&, std::string filename = "in_pat.txt") const;
+    void ReadIORelation      (std::string filename = "io_rel.txt");
+    void RunIOGen            () const;
 
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
-	//Generate PLA file for abc
-	void GenerateBLIF(std::string filename = "pat.blif");
-	void GeneratePLA(std::string filename = "pat.pla");
+    //Generate PLA file for abc
+    void GenerateBLIF(std::string filename = "pat.blif");
+    void GeneratePLA (std::string filename = "pat.pla");
 
 private:
     std::vector<Variable>  _input;
@@ -81,8 +85,8 @@ private:
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
 
-	// ABC frame work
-	inline void AbcError(const char* command) {
+    // ABC frame work
+    inline void AbcError(const char* command) {
         cerr << "Cannot execute command \"" << command << "\"" << endl;
         exit(-1);
     }

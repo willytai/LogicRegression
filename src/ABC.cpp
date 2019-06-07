@@ -32,7 +32,7 @@ using namespace ABC_NAMESPACE;
 }
 #endif
 
-// frame work variables
+// framework variables
 static Abc_Frame_t *pAbc;
 static clock_t clkRead, clkStrash, clk, clkCurrentProcedure, clkLastProcedure;
 static const char* command;
@@ -40,11 +40,19 @@ static const char* command;
 namespace LogicRegression
 {
 
+void Mgr::RunAbc() {
+    this->InitABC();
+    this->ReadPLAABC();
+    this->SynthesisABC();
+    this->TechMapABC();
+    this->EndABC();
+}
+
 /* start ABC framework */
 void Mgr::InitABC() {
     cout << endl;
     cout << "************************************************" << endl;
-    cout << "*             ABC Frame Work Start             *" << endl;
+    cout << "*             ABC Framework Start              *" << endl;
     cout << "************************************************" << endl;
 
     // start the ABC frame work
@@ -56,12 +64,12 @@ void Mgr::InitABC() {
 
 /* read PLA file into ABC */
 void Mgr::ReadPLAABC(const std::string filename){
-	/* read PLA file & convert it to AIG */
+    /* read PLA file & convert it to AIG */
     command = ("read " + filename).c_str();
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
     clkRead = clock() - clk;
     cout << "[ABC]    Reading: " << (float)(clkRead) / (float)(CLOCKS_PER_SEC) << " sec" << endl;
-	cout << endl;
+    cout << endl;
 
     command = "strash";
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
@@ -76,101 +84,101 @@ void Mgr::ReadPLAABC(const std::string filename){
 /* logic synthesis procedure */
 void Mgr::SynthesisABC(){
 
-	/* perform logic synthesis using aig */
-	/* the synthesis precedure is introduced in paper "DAG-Aware AIG Rewriting" */
-	clkLastProcedure = clkStrash;
-	cout << "[ABC]    Start synthesis" << endl;
+    /* perform logic synthesis using aig */
+    /* the synthesis precedure is introduced in paper "DAG-Aware AIG Rewriting" */
+    clkLastProcedure = clkStrash;
+    cout << "[ABC]    Start synthesis" << endl;
 
-	command = "balance";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    command = "balance";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
-
-
-	command = "rewrite";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
-
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
-
-	
-	command = "refactor";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    refactor: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
-
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
 
-	command = "balance";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    command = "rewrite";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
+    
+    command = "refactor";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    refactor: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "rewrite";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
-
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
-
-
-	command = "rewrite -z";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
-
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
 
-	command = "balance";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    command = "balance";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
-
-
-	command = "refactor -z";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    refactor -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
-
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
 
-	command = "rewrite -z";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    command = "rewrite";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
 
-	command = "balance";
-	if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-	cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    command = "rewrite -z";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
-	command = "print_stats";
-	if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
 
-	cout << "[ABC]    End synthesis" << endl;
+
+    command = "balance";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+
+
+    command = "refactor -z";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    refactor -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+
+
+    command = "rewrite -z";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+
+
+    command = "balance";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+
+    command = "print_stats";
+    if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
+
+    cout << "[ABC]    End synthesis" << endl;
 }
 
 
@@ -182,7 +190,7 @@ void Mgr::TechMapABC(){
 /* end ABC framework */
 void Mgr::EndABC(){
     cout << "************************************************" << endl;
-    cout << "*             ABC Frame Work End               *" << endl;
+    cout << "*             ABC Framework End                *" << endl;
     cout << "************************************************" << endl;
     Abc_Stop();
 }
