@@ -13,7 +13,7 @@
 
 
 namespace LogicRegression
-{    
+{
 void Mgr::GeneratePLA(std::string filename)
 {
 /* Define the function which generate PLA file for abc from pattern */

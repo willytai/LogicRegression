@@ -68,11 +68,15 @@ public:
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
-    //Generate PLA file for abc
-    void GenerateBLIF(std::string filename = "pat.blif");
+    // Generate PLA file for abc
     void GeneratePLA (std::string filename = "pat.pla");
 
+    // Generate BLIF file for abc
+    void GenerateBLIF(std::string filename = "pat.blif");
+    void CollectOnSetPatterns(std::vector<std::string>&, const int&);
+
 private:
+    std::string            _benchmark;
     std::vector<Variable>  _input;
     std::vector<Variable>  _output;
     std::string            _iogen;

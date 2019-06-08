@@ -11,6 +11,8 @@ void Mgr::ReadIOInfo(char* filename) {
         exit(-1);
     }
 
+    _benchmark = std::string(filename).substr(0, std::string(filename).find("io"));
+
     file >> _numInput >> _numOutput;
     while ( (int)_input.size() != _numInput ) {
         std::string buffer;
@@ -109,18 +111,6 @@ void Mgr::ReadIORelation(std::string filename) {
     }
 
     _numPat = numRelation;
-
-    /*
-    for (int i = 0; i < _relation_in.size(); ++i) {
-        cout << (_relation_in[i].back() & MASK) << ' ';
-    }
-    cout << endl;
-    for (int i = 0; i < _relation_out.size(); ++i) {
-        cout << (_relation_out[i].back() & MASK) << ' ';
-    }
-    cout << endl;
-    exit(0);
-    */
 }
 
 }
