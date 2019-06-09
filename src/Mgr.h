@@ -22,7 +22,7 @@
 
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
-#define MIN_ENUMERATE_VAR_NUM 6
+#define MIN_ENUMERATE_VAR_NUM 5
 
 using std::cout;
 using std::endl;
@@ -51,7 +51,7 @@ public:
     /* Abc's procedure */
     /*******************/
     void InitABC        ();
-    void ReadPLAABC     (const std::string filename = "pat.pla");
+    void ReadABC        (const std::string filename = "pat.blif");
     void SynthesisABC   ();
     void TechMapABC     ();
     void EndABC         ();
@@ -73,7 +73,9 @@ public:
 
     // Generate BLIF file for abc
     void GenerateBLIF(std::string filename = "pat.blif");
-    void CollectOnSetPatterns(std::vector<std::string>&, const int&);
+    void CollectOnSetPatterns(std::vector<std::string>&, const int&); // duplicates are removed here
+    void Merge(std::string&, const std::string&);
+    bool DiffByOne(const std::string&, const std::string&);
 
 private:
     std::string            _benchmark;

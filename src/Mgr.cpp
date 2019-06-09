@@ -161,7 +161,7 @@ void Mgr::refinePattern
         std::string pattern(_numInput, 'X');
         int patternKey = 0;
         for (int j = 0; j < chosenVarNum; ++j) {
-            bool   tmp = ( ( i >> (j) ) & MASK );
+            bool   tmp = ( ( i >> j ) & MASK );
             int in_id  = info[partition_index-1-j].second;
             pattern[in_id] = ( tmp ? '1' : '0' );
             patternKey += tmp;

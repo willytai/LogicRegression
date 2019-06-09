@@ -42,7 +42,7 @@ namespace LogicRegression
 
 void Mgr::RunAbc() {
     this->InitABC();
-    this->ReadPLAABC();
+    this->ReadABC();
     this->SynthesisABC();
     this->TechMapABC();
     this->EndABC();
@@ -63,7 +63,7 @@ void Mgr::InitABC() {
 
 
 /* read PLA file into ABC */
-void Mgr::ReadPLAABC(const std::string filename){
+void Mgr::ReadABC(const std::string filename){
     /* read PLA file & convert it to AIG */
     command = ("read " + filename).c_str();
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
