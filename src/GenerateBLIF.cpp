@@ -26,10 +26,15 @@ void Mgr::GenerateBLIF(std::string filename) {
     for (int i = 0; i < _numOutput; ++i) {
         std::vector<std::string> patterns;
         this->CollectOnSetPatterns(patterns, i);
-        blifFile << ".names";
-        for (int j = 0; j < _numInput; ++j) blifFile << ' ' << _input[j]._name;
-        blifFile << ' ' << _output[i]._name << endl;
-        for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << 1 << endl;
+        if (patterns.size()) {
+            blifFile << ".names";
+            for (int j = 0; j < _numInput; ++j) blifFile << ' ' << _input[j]._name;
+            blifFile << ' ' << _output[i]._name << endl;
+            for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << 1 << endl;
+        }
+        else {
+            blifFile << ".names " << _output[i]._name << endl;
+        }
     }
     blifFile << ".end" << endl;
     cout << "[Mgr]    Finished writing BLIF file." << endl;
