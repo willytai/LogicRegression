@@ -44,6 +44,7 @@ void Mgr::RunAbc() {
     this->InitABC();
     this->ReadABC();
     this->SynthesisABC();
+	this->SimulateABC();
     this->TechMapABC();
     this->EndABC();
 }
@@ -181,6 +182,15 @@ void Mgr::SynthesisABC(){
     cout << "[ABC]    End synthesis" << endl;
 }
 
+void Mgr::SimulateABC(std::string filename){
+	cout << "[ABC]    Start simulation: " << endl;
+	clkLastProcedure = clock();
+    command = ("sim_aig " + filename).c_str();
+    if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
+	clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    simulation: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+	cout << "[ABC]    End simulation" << endl;
+}
 
 /* perform technology mapping & ouput verilog file */
 void Mgr::TechMapABC(){

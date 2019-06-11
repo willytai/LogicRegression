@@ -53,6 +53,7 @@ public:
     void InitABC        ();
     void ReadABC        (const std::string filename = "pat.blif");
     void SynthesisABC   ();
+	void SimulateABC	(const std::string filename = "pat.pla");
     void TechMapABC     ();
     void EndABC         ();
 
