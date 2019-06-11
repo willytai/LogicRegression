@@ -55,20 +55,6 @@ private:
 	std::vector< std::string > unSatisfiedPattern;
 };
 
-class SimulationPattern
-{
-public:
-	SimulationPattern(size_t num):size(num){
-		pattern = new std::bitset<64>(num);
-	}
-	~SimulationPattern(){
-		delete pattern;
-	}
-	SimulationPattern comparePattern(const SimulationPattern);
-private:
-	std::bitset<64>* pattern;
-	size_t size;
-};
 
 ABC_NAMESPACE_HEADER_END  
 #endif

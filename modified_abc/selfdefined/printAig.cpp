@@ -4,6 +4,10 @@
 
 ABC_NAMESPACE_IMPL_START
 
+/* self defined function  */
+/* print every PI, PO and gate's fanin */
+/* basically useless, just for debugging purpose */
+/* type command print_aigIO to toggle this function */
 int Abc_printAig( Abc_Ntk_t * pNtk){
 	if (pNtk == NULL) return 1;
 	Abc_Obj_t * pNode;
