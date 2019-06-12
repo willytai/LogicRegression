@@ -7,7 +7,8 @@ void Mgr::GenerateBLIF(std::string filename) {
     cout << "[Mgr]    creating BLIF file from random pattern ..." << endl;
     std::ofstream blifFile;
     blifFile.open(filename.c_str());
-    blifFile << ".model ICCAD:" << _benchmark << endl;
+    // blifFile << ".model ICCAD:" << _benchmark << endl;
+    blifFile << ".model top" << endl;
 
     /* input variable names in order */
     blifFile << ".inputs";
