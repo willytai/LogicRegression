@@ -197,6 +197,9 @@ void Mgr::TechMapABC(){
     // Technology mapping
     cout << "[ABC]    Start Technology mapping: " << endl;
     clkLastProcedure = clock();
+    command = "read_library ../gates/lib.sic";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+
     command = "map";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
     clkCurrentProcedure = clock() - clkLastProcedure;
@@ -204,10 +207,10 @@ void Mgr::TechMapABC(){
     cout << "[ABC]    End Technology mapping" << endl;
 
     // Output Verilog
-    command = "write verilog";
+    command = "write_verilog";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
     clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    write verilog: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    cout << "[ABC]    write_verilog: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 }
 
 /* end ABC framework */
