@@ -14,6 +14,10 @@ void Mgr::DetermineInitParam() {
     cout << "[Mgr]    Initial number of patterns to perform synthesis: " << _initPatNum << endl;
 }
 
+void Mgr::SetOutput(char* filename) {
+    _verilog_output = filename;
+}
+
 void Mgr::GenPattern() {
     int initPatNumFactor = 20;
     cout << "[Mgr]    Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;

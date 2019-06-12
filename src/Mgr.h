@@ -44,6 +44,7 @@ public:
     /***********/
     void ReadIOInfo        (char*);
     void ReadIOGen         (char*);
+    void SetOutput         (char*);
     void GenPattern        ();
     void DetermineInitParam();
     void RunAbc            ();
@@ -87,6 +88,7 @@ private:
     int                    _numInput;
     int                    _numOutput;
     int                    _numPat;
+    char*                  _verilog_output;
 
     // the initial number of patterns to do synthesis
     int                    _initPatNum;
