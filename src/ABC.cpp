@@ -194,7 +194,20 @@ void Mgr::SimulateABC(std::string filename){
 
 /* perform technology mapping & ouput verilog file */
 void Mgr::TechMapABC(){
+    // Technology mapping
+    cout << "[ABC]    Start Technology mapping: " << endl;
+    clkLastProcedure = clock();
+    command = "map";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    Technology mapping: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << "sec" << endl;
+    cout << "[ABC]    End Technology mapping" << endl;
 
+    // Output Verilog
+    command = "write verilog";
+    if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
+    clkCurrentProcedure = clock() - clkLastProcedure;
+    cout << "[ABC]    write verilog: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 }
 
 /* end ABC framework */
