@@ -22,7 +22,7 @@
 
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
-#define MIN_ENUMERATE_VAR_NUM 5
+#define MIN_ENUMERATE_VAR_NUM 6
 
 using std::cout;
 using std::endl;
@@ -42,10 +42,11 @@ public:
     /***********/
     /* Top API */
     /***********/
-    void ReadIOInfo     (char*);
-    void ReadIOGen      (char*);
-    void GenPattern     ();
-    void RunAbc         ();
+    void ReadIOInfo        (char*);
+    void ReadIOGen         (char*);
+    void GenPattern        ();
+    void DetermineInitParam();
+    void RunAbc            ();
 
     /*******************/
     /* Abc's procedure */
@@ -86,6 +87,9 @@ private:
     int                    _numInput;
     int                    _numOutput;
     int                    _numPat;
+
+    // the initial number of patterns to do synthesis
+    int                    _initPatNum;
 
     std::vector<std::vector<Pat> > _relation_in;
     std::vector<std::vector<Pat> > _relation_out;

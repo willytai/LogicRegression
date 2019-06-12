@@ -7,6 +7,13 @@ extern MyUsage usg;
 namespace LogicRegression
 {
 
+void Mgr::DetermineInitParam() {
+    // determine the initial number of patterns to synthesize
+    // proportional to _numInput and _numOutput
+    _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.3) * 600;
+    cout << "[Mgr]    Initial number of patterns to perform synthesis: " << _initPatNum << endl;
+}
+
 void Mgr::GenPattern() {
     int initPatNumFactor = 20;
     cout << "[Mgr]    Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
@@ -25,6 +32,8 @@ void Mgr::GenPattern() {
     this->WritePattern(patBank);
     this->RunIOGen();
     this->ReadIORelation();
+    this->GenerateBLIF(); // initial patterns
+    this->GeneratePLA();  // patterns for simulation
 }
 
 void Mgr::GenerateInputPattern(std::string filename, int numPat) {
