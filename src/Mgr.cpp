@@ -11,6 +11,19 @@ void Mgr::DetermineInitParam() {
     // determine the initial number of patterns to synthesize
     // proportional to _numInput and _numOutput
     _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.3) * 600;
+    // round to a multiple of UnitPatSize for simplisity
+    int offset = 0;
+    while (true) {
+        if ( (_initPatNum + offset) % UnitPatSize == 0) {
+            _initPatNum += offset;
+            break;
+        }
+        if ( (_initPatNum - offset) % UnitPatSize == 0) {
+            _initPatNum -= offset;
+            break;
+        }
+        ++offset;
+    }
     cout << "[Mgr]    Initial number of patterns to perform synthesis: " << _initPatNum << endl;
 }
 
