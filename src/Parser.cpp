@@ -3,6 +3,12 @@
 namespace LogicRegression
 {
 
+void Mgr::SetOutput(char* filename) {
+    _verilog_output = filename;
+    cout << "[Parser] output filename: " << _verilog_output << endl;
+}
+
+
 void Mgr::ReadIOInfo(char* filename) {
     std::ifstream file;
     file.open(filename);

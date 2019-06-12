@@ -93,6 +93,9 @@ private:
     // the initial number of patterns to do synthesis
     int                    _initPatNum;
 
+    // the end index of the patterns for synthesis _relation_in[id][0] ~ _relation_in[id][_syn_end-1]
+    int                    _syn_end;
+
     std::vector<std::vector<Pat> > _relation_in;
     std::vector<std::vector<Pat> > _relation_out;
 

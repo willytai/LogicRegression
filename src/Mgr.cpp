@@ -10,7 +10,7 @@ namespace LogicRegression
 void Mgr::DetermineInitParam() {
     // determine the initial number of patterns to synthesize
     // proportional to _numInput and _numOutput
-    _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.3) * 600;
+    _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.2) * 600;
     // round to a multiple of UnitPatSize for simplisity
     int offset = 0;
     while (true) {
@@ -25,10 +25,7 @@ void Mgr::DetermineInitParam() {
         ++offset;
     }
     cout << "[Mgr]    Initial number of patterns to perform synthesis: " << _initPatNum << endl;
-}
-
-void Mgr::SetOutput(char* filename) {
-    _verilog_output = filename;
+    _syn_end = _initPatNum / 64;
 }
 
 void Mgr::GenPattern() {
@@ -165,6 +162,9 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
 void Mgr::refinePattern
 (PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {
 
+    // for visualization
+    int old = patBank.size();
+
     // find best partition
     int partition_index = info.size();
     while (partition_index == (int)info.size() || partition_index >= MAX_ENUMERATE_VAR_NUM) {
@@ -194,7 +194,7 @@ void Mgr::refinePattern
         }
         patBank.insert(pattern);
     }
-    cout << "[Mgr]    " << patBank.size() << " base patterns generated." << endl;
+    cout << "[Mgr]    " << patBank.size()-old << " additional base patterns generated." << endl;
 }
 
 void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 #include <cstdlib>
 
 extern Pattern::Generator Gen;
@@ -15,6 +16,10 @@ namespace LogicRegression
    void PatternBank::random_sample() {
      cout << "[PatBank] number of base patterns: " << _patterns.size() << endl;
      cout << "[PatBank] sampling patterns ..." << endl;
+
+     // shuffle the patterns fisrt
+     std::random_shuffle(_patterns.begin(), _patterns.end());
+
      std::vector<std::string> sample;
      for (int i = 0; i < (int)_patterns.size(); ++i) {
         int unkown = this->count_X(_patterns[i]);
@@ -30,6 +35,9 @@ namespace LogicRegression
         }
      }
      _patterns.swap(sample);
+
+     // shuffle again
+     std::random_shuffle(_patterns.begin(), _patterns.end());
      cout << "[PatBank] " << size() << " patterns sampled." << endl;
    }
 

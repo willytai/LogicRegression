@@ -46,7 +46,8 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
 
     // collect patterns
     int count = 0;
-    for (int batch = 0; batch < (int)_relation_out[PO_id].size(); ++batch) {
+    // only batches for synthesis
+    for (int batch = 0; batch < _syn_end; ++batch) {
         for (int shift = 0; shift < UnitPatSize; ++shift) {
             if ( !( ( _relation_out[PO_id][batch] >> shift ) & MASK ) ) {
                 ++count;

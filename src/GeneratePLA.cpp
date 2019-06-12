@@ -39,7 +39,8 @@ void Mgr::GeneratePLA(std::string filename)
     cout << "[Mgr]    total patterns = " << size << endl;
     /* plaFile << ".p " << size << endl; */
     int count = 0;
-    for (int batch = 0; batch < (int)_relation_in[0].size(); ++batch) {
+    // only the batches for simulation
+    for (int batch = _syn_end; batch < (int)_relation_in[0].size(); ++batch) {
         for (int shift = 0; shift < UnitPatSize; ++shift) {
             for (int input_id = 0; input_id < _numInput; ++input_id) {
                 plaFile << ( ( _relation_in[input_id][batch] >> shift ) & MASK );
