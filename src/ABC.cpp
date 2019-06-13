@@ -34,7 +34,7 @@ using namespace ABC_NAMESPACE;
 
 // framework variables
 static Abc_Frame_t *pAbc;
-static clock_t clkRead, clkStrash, clk, clkCurrentProcedure, clkLastProcedure;
+static clock_t clkElapse, clkLast;
 static const char* command;
 
 namespace LogicRegression
@@ -59,7 +59,7 @@ void Mgr::InitABC() {
     // start the ABC frame work
     Abc_Start();
     pAbc = Abc_FrameGetGlobalFrame();
-    clk  = clock();
+    clkLast  = clock();
 }
 
 
@@ -68,14 +68,16 @@ void Mgr::ReadABC(const std::string filename){
     /* read PLA file & convert it to AIG */
     command = ("read " + filename).c_str();
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
-    clkRead = clock() - clk;
-    cout << "[ABC]    Reading: " << (float)(clkRead) / (float)(CLOCKS_PER_SEC) << " sec" << endl;
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    Reading: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl;
     cout << endl;
 
     command = "strash";
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
-    clkStrash = clock() - clkRead;
-    cout << "[ABC]    Strashing: " << (float)(clkStrash) / (float)(CLOCKS_PER_SEC) << " sec" << endl;
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    Strashing: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl;
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
@@ -87,13 +89,14 @@ void Mgr::SynthesisABC(){
 
     /* perform logic synthesis using aig */
     /* the synthesis precedure is introduced in paper "DAG-Aware AIG Rewriting" */
-    clkLastProcedure = clkStrash;
+    clkLast = clock();
     cout << "[ABC]    Start synthesis" << endl;
 
     command = "balance";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    balance: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -101,8 +104,9 @@ void Mgr::SynthesisABC(){
 
     command = "rewrite";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    rewrite: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -110,8 +114,9 @@ void Mgr::SynthesisABC(){
     
     command = "refactor";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    refactor: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    refactor: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -119,8 +124,9 @@ void Mgr::SynthesisABC(){
 
     command = "balance";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    balance: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -128,8 +134,9 @@ void Mgr::SynthesisABC(){
 
     command = "rewrite";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    rewrite: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    rewrite: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -137,8 +144,9 @@ void Mgr::SynthesisABC(){
 
     command = "rewrite -z";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    rewrite -z: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -146,8 +154,9 @@ void Mgr::SynthesisABC(){
 
     command = "balance";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    balance: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -155,8 +164,9 @@ void Mgr::SynthesisABC(){
 
     command = "refactor -z";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    refactor -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    refactor -z: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -164,8 +174,9 @@ void Mgr::SynthesisABC(){
 
     command = "rewrite -z";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    rewrite -z: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    rewrite -z: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -173,8 +184,9 @@ void Mgr::SynthesisABC(){
 
     command = "balance";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    balance: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    balance: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 
     command = "print_stats";
     if (Cmd_CommandExecute( pAbc, command)) this->AbcError(command);
@@ -184,11 +196,12 @@ void Mgr::SynthesisABC(){
 
 void Mgr::SimulateABC(std::string filename){
 	cout << "[ABC]    Start simulation: " << endl;
-	clkLastProcedure = clock();
+	clkLast = clock();
     command = ("sim_aig " + filename).c_str();
     if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
-	clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    simulation: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    simulation: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 	cout << "[ABC]    End simulation" << endl;
 }
 
@@ -196,21 +209,23 @@ void Mgr::SimulateABC(std::string filename){
 void Mgr::TechMapABC(){
     // Technology mapping
     cout << "[ABC]    Start Technology mapping: " << endl;
-    clkLastProcedure = clock();
+    clkLast = clock();
     command = "read_library gates/lib.sic";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
 
     command = "map";
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    Technology mapping: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << "sec" << endl;
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    Technology mapping: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << "sec" << endl;
     cout << "[ABC]    End Technology mapping" << endl;
 
     // Output Verilog
     command = ("write_verilog " + std::string(_verilog_output)).c_str();
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);
-    clkCurrentProcedure = clock() - clkLastProcedure;
-    cout << "[ABC]    write_verilog: " << (float)(clkCurrentProcedure) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
+    clkElapse = clock() - clkLast;
+    clkLast += clkElapse;
+    cout << "[ABC]    write_verilog: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 
 }
 
 /* end ABC framework */
