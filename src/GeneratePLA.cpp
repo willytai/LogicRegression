@@ -17,7 +17,7 @@ namespace LogicRegression
 void Mgr::GeneratePLA(std::string filename)
 {
 /* Define the function which generate PLA file for abc from pattern */
-    cout << "[Mgr]    creating PLA file from random pattern" << endl;
+    cout << "[  Mgr  ] creating PLA file from random pattern" << endl;
     std::ofstream plaFile;
     plaFile.open(filename.c_str());
     /* plaFile << "# created by random simulated pattern " << endl; */
@@ -36,7 +36,7 @@ void Mgr::GeneratePLA(std::string filename)
     /* specify pattern number */
     /* specify input_pattern & output_pattern */    
     const int& size = _numPat;
-    cout << "[Mgr]    total patterns = " << size << endl;
+    cout << "[  Mgr  ] total patterns = " << size << endl;
     /* plaFile << ".p " << size << endl; */
     int count = 0;
     // only the batches for simulation
@@ -56,7 +56,7 @@ void Mgr::GeneratePLA(std::string filename)
     }
     /* specify end of file */
     /* plaFile << ".e" << endl; */
-    cout << "[Mgr]    creating PLA file done" << endl;
+    cout << "[  Mgr  ] creating PLA file done" << endl;
 }
 /* end of namespace */
 }

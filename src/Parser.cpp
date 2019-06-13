@@ -5,7 +5,7 @@ namespace LogicRegression
 
 void Mgr::SetOutput(char* filename) {
     _verilog_output = filename;
-    cout << "[Parser] output filename: " << _verilog_output << endl;
+    cout << "[ Parser] output filename: " << _verilog_output << endl;
 }
 
 
@@ -13,7 +13,7 @@ void Mgr::ReadIOInfo(char* filename) {
     std::ifstream file;
     file.open(filename);
     if ( !file.is_open() ) {
-        cerr << "[Parser] Cannot open file: " << filename << endl;
+        cerr << "[ Parser] Cannot open file: " << filename << endl;
         exit(-1);
     }
 
@@ -33,10 +33,10 @@ void Mgr::ReadIOInfo(char* filename) {
         _output_variable_name_id_map[buffer] = _output.size() - 1;
     }
 
-    cout << "[Parser] Input  Variables (" << _numInput << "):";
+    cout << "[ Parser] Input  Variables (" << _numInput << "):";
     for (int i = 0; i < _numInput; ++i) cout << ' ' << _input[i]._name;
     cout << endl;
-    cout << "[Parser] Output Variables (" << _numOutput << "):";
+    cout << "[ Parser] Output Variables (" << _numOutput << "):";
     for (int i = 0; i < _numOutput; ++i) cout << ' ' << _output[i]._name;
     cout << endl;
 
@@ -46,12 +46,12 @@ void Mgr::ReadIOInfo(char* filename) {
 
 void Mgr::ReadIOGen(char* filename) {
     _iogen = filename;
-    cout << "[Parser] IO Generator: " << _iogen << endl;
+    cout << "[ Parser] IO Generator: " << _iogen << endl;
 }
 
 void Mgr::ReadIORelation(std::string filename) {
 
-    cout << "[Parser] Reading IO relation ..." << endl;
+    cout << "[ Parser] Reading IO relation ..." << endl;
 
     _relation_in.clear();
     _relation_out.clear();

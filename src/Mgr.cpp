@@ -24,13 +24,13 @@ void Mgr::DetermineInitParam() {
         }
         ++offset;
     }
-    cout << "[Mgr]    Initial number of patterns to perform synthesis: " << _initPatNum << endl;
+    cout << "[  Mgr  ] Initial number of patterns to perform synthesis: " << _initPatNum << endl;
     _syn_end = _initPatNum / 64;
 }
 
 void Mgr::GenPattern() {
     int initPatNumFactor = 20;
-    cout << "[Mgr]    Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
+    cout << "[  Mgr  ] Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
     this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*initPatNumFactor);
     this->RunIOGen();
     this->ReadIORelation();
@@ -84,13 +84,13 @@ void Mgr::GenerateInputPattern(std::string filename, int numPat) {
 }
 
 void Mgr::RunIOGen() const {
-    cout << "[Mgr]    Generating relation from " << _iogen << " ..." << endl;
+    cout << "[  Mgr  ] Generating relation from " << _iogen << " ..." << endl;
     std::system(("./"+_iogen+" in_pat.txt io_rel.txt").c_str());
 }
 
 void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
     cout << endl;
-    cout << "[Mgr]    Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
+    cout << "[  Mgr  ] Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
     assert(PO_id < (int)_output.size());
 
     // calculate entropy for the corresponding output
@@ -179,8 +179,8 @@ void Mgr::refinePattern
         }
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
-    cout << "[Mgr]    Number of chosen input variables: " << partition_index << endl;
-    cout << "[Mgr]    Enumerating and combining patterns ..." << endl;
+    cout << "[  Mgr  ] Number of chosen input variables: " << partition_index << endl;
+    cout << "[  Mgr  ] Enumerating and combining patterns ..." << endl;
 
     const int& chosenVarNum = partition_index;
     for (int i = 0; i < ( 1 << chosenVarNum ); ++i) {
@@ -194,7 +194,7 @@ void Mgr::refinePattern
         }
         patBank.insert(pattern);
     }
-    cout << "[Mgr]    " << patBank.size()-old << " additional base patterns generated." << endl;
+    cout << "[  Mgr  ] " << patBank.size()-old << " additional base patterns generated." << endl;
 }
 
 void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {

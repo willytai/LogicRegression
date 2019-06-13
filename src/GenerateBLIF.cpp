@@ -4,7 +4,7 @@ namespace LogicRegression
 {
 
 void Mgr::GenerateBLIF(std::string filename) {
-    cout << "[Mgr]    creating BLIF file from random pattern ..." << endl;
+    cout << "[  Mgr  ] creating BLIF file from random pattern ..." << endl;
     std::ofstream blifFile;
     blifFile.open(filename.c_str());
     // blifFile << ".model ICCAD:" << _benchmark << endl;
@@ -38,11 +38,11 @@ void Mgr::GenerateBLIF(std::string filename) {
         }
     }
     blifFile << ".end" << endl;
-    cout << "[Mgr]    Finished writing BLIF file." << endl;
+    cout << "[  Mgr  ] Finished writing BLIF file." << endl;
 }
 
 void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO_id) {
-    cout << "[Mgr]    Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
+    cout << "[  Mgr  ] Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
 
     // collect patterns
     int count = 0;
