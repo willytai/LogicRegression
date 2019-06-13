@@ -7,10 +7,10 @@ extern MyUsage usg;
 namespace LogicRegression
 {
 
-void Mgr::DetermineInitParam() {
+void Mgr::DetermineInitParam(int estimateInputNum) {
     // determine the initial number of patterns to synthesize
-    // proportional to _numInput and _numOutput
-    _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.2) * 600;
+    // proportional to _numInput only (one output at a time)
+    _initPatNum = std::log10(estimateInputNum) / std::log10(1.2) * 600;
     // round to a multiple of UnitPatSize for simplisity
     int offset = 0;
     while (true) {
@@ -28,7 +28,18 @@ void Mgr::DetermineInitParam() {
     _syn_end = _initPatNum / 64;
 }
 
-void Mgr::GenPattern() {
+void Mgr::IncrementalSyn() {
+    // Synthesize evey output seperately
+    // after all of the accuracy reached 99.99%
+    // collect all the used patterns and perform a whole synthesis
+    for (int i = 0; i < _numOutput; ++i) {
+        cout << "[  Mgr  ] Synthesis for output: " << _output[i]._name << endl;
+        this->GenPattern(i);
+        break;
+    }
+}
+
+void Mgr::GenPattern(int PO_id) {
     int initPatNumFactor = 20;
     cout << "[  Mgr  ] Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
     this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*initPatNumFactor);
@@ -37,17 +48,17 @@ void Mgr::GenPattern() {
 
     PatternBank patBank;
 
-    for (int i = 0; i < (int)_output.size(); ++i) {
-        std::vector<std::pair<double, VariableID> > info;
-        this->CalInfoGain(i, info);
-        this->refinePattern(patBank, info);
-    }
+    std::vector<std::pair<double, VariableID> > info;
+    this->CalInfoGain(PO_id, info);
+    this->refinePattern(patBank, info);
+
     patBank.random_sample();
+
     this->WritePattern(patBank);
     this->RunIOGen();
     this->ReadIORelation();
-    this->GenerateBLIF(); // initial patterns
-    this->GeneratePLA();  // patterns for simulation
+    this->GenerateBLIF(PO_id); // initial patterns
+    this->GeneratePLA(PO_id);  // patterns for simulation
 }
 
 void Mgr::GenerateInputPattern(std::string filename, int numPat) {
@@ -180,6 +191,7 @@ void Mgr::refinePattern
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
     cout << "[  Mgr  ] Number of chosen input variables: " << partition_index << endl;
+    this->DetermineInitParam(partition_index);
     cout << "[  Mgr  ] Enumerating and combining patterns ..." << endl;
 
     const int& chosenVarNum = partition_index;

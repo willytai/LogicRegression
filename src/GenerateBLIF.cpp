@@ -41,6 +41,40 @@ void Mgr::GenerateBLIF(std::string filename) {
     cout << "[  Mgr  ] Finished writing BLIF file." << endl;
 }
 
+void Mgr::GenerateBLIF(int PO_id, std::string filename) {
+    cout << "[  Mgr  ] creating BLIF file from random pattern ..." << endl;
+    std::ofstream blifFile;
+    blifFile.open(filename.c_str());
+    // blifFile << ".model ICCAD:" << _benchmark << endl;
+    blifFile << ".model top" << endl;
+
+    /* input variable names in order */
+    blifFile << ".inputs";
+    for (int i = 0; i < _numInput; ++i) {
+        blifFile << ' ' << _input[i]._name;
+    }
+    blifFile << endl;
+
+    /* output variable names in order */
+    blifFile << ".outputs";
+    blifFile << ' ' << _output[PO_id]._name;
+    blifFile << endl;
+
+    std::vector<std::string> patterns;
+    this->CollectOnSetPatterns(patterns, PO_id);
+    if (patterns.size()) {
+        blifFile << ".names";
+        for (int j = 0; j < _numInput; ++j) blifFile << ' ' << _input[j]._name;
+        blifFile << ' ' << _output[PO_id]._name << endl;
+        for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << 1 << endl;
+    }
+    else {
+        blifFile << ".names " << _output[PO_id]._name << endl;
+    }
+    blifFile << ".end" << endl;
+    cout << "[  Mgr  ] Finished writing BLIF file." << endl;
+}
+
 void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO_id) {
     cout << "[  Mgr  ] Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
 

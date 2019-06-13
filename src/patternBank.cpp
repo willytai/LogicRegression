@@ -23,7 +23,7 @@ namespace LogicRegression
      std::vector<std::string> sample;
      for (int i = 0; i < (int)_patterns.size(); ++i) {
         int unkown = this->count_X(_patterns[i]);
-        int expand_num = ( unkown == 0 ? 1 : std::log10( std::pow(2, unkown) ) / std::log10( 1.01 ) );
+        int expand_num = ( unkown == 0 ? 1 : std::log10( std::pow(2, unkown) ) / std::log10( 1.03 ) );
         // cout << "sampling " << expand_num << " patterns with " << unkown << " unkown inputs" << endl;
         for (int j = 0; j < expand_num; ++j) {
            std::string newPat(_patterns[i]);

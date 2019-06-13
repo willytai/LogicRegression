@@ -22,7 +22,7 @@
 
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
-#define MIN_ENUMERATE_VAR_NUM 6
+#define MIN_ENUMERATE_VAR_NUM 5
 
 using std::cout;
 using std::endl;
@@ -45,8 +45,9 @@ public:
     void ReadIOInfo        (char*);
     void ReadIOGen         (char*);
     void SetOutput         (char*);
-    void GenPattern        ();
-    void DetermineInitParam();
+    void IncrementalSyn    ();
+    void GenPattern        (int);
+    void DetermineInitParam(int);
     void RunAbc            ();
 
     /*******************/
@@ -73,9 +74,11 @@ public:
 
     // Generate PLA file for abc
     void GeneratePLA (std::string filename = "pat.pla");
+    void GeneratePLA (int, std::string filename = "pat.pla");
 
     // Generate BLIF file for abc
     void GenerateBLIF(std::string filename = "pat.blif");
+    void GenerateBLIF(int, std::string filename = "pat.blif");
     void CollectOnSetPatterns(std::vector<std::string>&, const int&); // duplicates are removed here
     void Merge(std::string&, const std::string&);
     bool DiffByOne(const std::string&, const std::string&);
