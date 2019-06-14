@@ -41,8 +41,9 @@ void Mgr::GenerateBLIF(std::string filename) {
     cout << "[  Mgr  ] Finished writing BLIF file." << endl;
 }
 
-void Mgr::GenerateBLIF(int PO_id, std::string filename) {
+void Mgr::GenerateBLIF(int PO_id, std::vector<std::pair<double, VariableID> >& info, std::string filename) {
     cout << "[  Mgr  ] creating BLIF file from random pattern ..." << endl;
+    int targetInput = info[0].second;
     std::ofstream blifFile;
     blifFile.open(filename.c_str());
     // blifFile << ".model ICCAD:" << _benchmark << endl;
@@ -66,7 +67,13 @@ void Mgr::GenerateBLIF(int PO_id, std::string filename) {
         blifFile << ".names";
         for (int j = 0; j < _numInput; ++j) blifFile << ' ' << _input[j]._name;
         blifFile << ' ' << _output[PO_id]._name << endl;
-        for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << 1 << endl;
+        for (int j = 0; j < (int)patterns.size(); ++j) {
+            for (int pi = 0; pi < (int)patterns[j].length(); ++pi) {
+                if (pi != targetInput) blifFile << '-';
+                else blifFile << patterns[j][pi];
+            }
+            blifFile << ' ' << 1 << endl;
+        }
     }
     else {
         blifFile << ".names " << _output[PO_id]._name << endl;
@@ -79,24 +86,17 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
     cout << "[  Mgr  ] Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
 
     // collect patterns
-    int count = 0;
     // only batches for synthesis
-    for (int batch = 0; batch < _syn_end; ++batch) {
-        for (int shift = 0; shift < UnitPatSize; ++shift) {
-            if ( !( ( _relation_out[PO_id][batch] >> shift ) & MASK ) ) {
-                ++count;
-                continue;
-            }
-            std::string temp(_numInput, '-');
-            for (int i = 0; i < _numInput; ++i) {
-                if ( ( _relation_in[i][batch] >> shift ) & MASK ) temp[i] = '1';
-                else temp[i] = '0';
-            }
-            patterns.push_back(temp);
-            if ( ++count == _numPat ) break;
+    patterns.clear();
+    std::string tmp(_numInput, 'X');
+    for (int pat_id = 0; pat_id < _initPatNum; ++pat_id) {
+        if ( _relation_out[PO_id][pat_id] == '0' ) {
+            continue;
         }
-        if ( count == _numPat ) break;
+        for (int PI_id = 0; PI_id < _numInput; ++PI_id) tmp[PI_id] = _relation_in[PI_id][pat_id];
+        patterns.push_back(tmp);
     }
+    return;
 
     // merge patterns that only differ by 1 bit
     // repeat until no merges can be found

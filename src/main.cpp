@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
     // LogicRegression::GetMgr().DetermineInitParam();
     LogicRegression::GetMgr().IncrementalSyn();
     // LogicRegression::GetMgr().GenPattern();
-    LogicRegression::GetMgr().RunAbc();
 
     usg.report(1, 1);
     return 0;

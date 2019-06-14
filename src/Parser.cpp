@@ -62,10 +62,8 @@ void Mgr::ReadIORelation(std::string filename) {
     std::ifstream file;
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
-    int TotalPat = numRelation / UnitPatSize;
-    if (numRelation%UnitPatSize) ++TotalPat;
-    for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(TotalPat);
-    for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(TotalPat);
+    for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(numRelation);
+    for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(numRelation);
 
     std::vector<std::string> variableNames;
     std::string buffer;
@@ -75,45 +73,26 @@ void Mgr::ReadIORelation(std::string filename) {
     }
 
     int relCount = 0;
-    std::vector<Pat> temp((_numInput + _numOutput), 0);
+    std::string temp((_numInput + _numOutput), 'X');
     while (relCount < numRelation) {
         for (int i = 0; i < (int)temp.size(); ++i) {
-            temp[i] = temp[i] << 1;
-            int value;
-            file >> value;
-            temp[i] += value;
+            file >> temp[i];
         }
-        if (++relCount % UnitPatSize == 0) {
-            for (int i = 0; i < (int)temp.size(); ++i) {
-                std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
-                if (it == _input_variable_name_id_map.end()) {
-                    it = _output_variable_name_id_map.find(variableNames[i]);
-                    VariableID id = (*it).second;
-                    _relation_out[id][relCount/UnitPatSize-1] = temp[i];
-                }
-                else {
-                    VariableID id = (*it).second;
-                    _relation_in[id][relCount/UnitPatSize-1] = temp[i];
-                }
-            }
-            temp.clear();
-            temp.resize((_numInput + _numOutput), 0);
-        }
-    }
-
-    if ( relCount % UnitPatSize != 0 ) {
         for (int i = 0; i < (int)temp.size(); ++i) {
             std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
             if (it == _input_variable_name_id_map.end()) {
                 it = _output_variable_name_id_map.find(variableNames[i]);
                 VariableID id = (*it).second;
-                _relation_out[id][relCount/UnitPatSize] = temp[i];
+                _relation_out[id][relCount] = temp[i];
             }
             else {
                 VariableID id = (*it).second;
-                _relation_in[id][relCount/UnitPatSize] = temp[i];
+                _relation_in[id][relCount] = temp[i];
             }
         }
+        temp.clear();
+        temp.resize((_numInput + _numOutput), 'X');
+        ++relCount;
     }
 
     _numPat = numRelation;

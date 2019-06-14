@@ -4,85 +4,127 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-CalEntropy	Mgr.cpp	/^void Mgr::CalEntropy(const int PO_id) {$/;"	f	class:LogicRegression::Mgr
-CalInfoGain	Mgr.cpp	/^void Mgr::CalInfoGain(const int PO_id) {$/;"	f	class:LogicRegression::Mgr
+ABC_NAMESPACE	ABC.cpp	/^namespace ABC_NAMESPACE$/;"	n	file:
+AbcError	Mgr.h	/^    inline void AbcError(const char* command) {$/;"	f	class:LogicRegression::Mgr
+Abc_Frame_t	ABC.cpp	/^typedef struct Abc_Frame_t_ Abc_Frame_t;$/;"	t	namespace:ABC_NAMESPACE	typeref:struct:ABC_NAMESPACE::Abc_Frame_t_	file:
 CalInfoGain	Mgr.cpp	/^void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {$/;"	f	class:LogicRegression::Mgr
-Gen	Mgr.cpp	/^static Pattern::Generator Gen;$/;"	v	file:
-GenPattern	Mgr.cpp	/^void Mgr::GenPattern() {$/;"	f	class:LogicRegression::Mgr
+CollectOnSetPatterns	GenerateBLIF.cpp	/^void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO_id) {$/;"	f	class:LogicRegression::Mgr
+DetermineInitParam	Mgr.cpp	/^void Mgr::DetermineInitParam(int estimateInputNum) {$/;"	f	class:LogicRegression::Mgr
+DiffByOne	GenerateBLIF.cpp	/^bool Mgr::DiffByOne(const std::string& s1, const std::string& s2) {$/;"	f	class:LogicRegression::Mgr
+EndABC	ABC.cpp	/^void Mgr::EndABC(){$/;"	f	class:LogicRegression::Mgr
+GenPattern	Mgr.cpp	/^void Mgr::GenPattern(int PO_id) {$/;"	f	class:LogicRegression::Mgr
+GenRandInfo	Mgr.cpp	/^void Mgr::GenRandInfo(std::vector<std::pair<double, VariableID> >& info) {$/;"	f	class:LogicRegression::Mgr
+GenerateBLIF	GenerateBLIF.cpp	/^void Mgr::GenerateBLIF(int PO_id, std::string filename) {$/;"	f	class:LogicRegression::Mgr
+GenerateBLIF	GenerateBLIF.cpp	/^void Mgr::GenerateBLIF(std::string filename) {$/;"	f	class:LogicRegression::Mgr
 GenerateInputPattern	Mgr.cpp	/^void Mgr::GenerateInputPattern(std::string filename, int numPat) {$/;"	f	class:LogicRegression::Mgr
+GeneratePLA	GeneratePLA.cpp	/^void Mgr::GeneratePLA(int PO_id, std::vector<std::pair<double, VariableID> >& info, std::string filename)$/;"	f	class:LogicRegression::Mgr
+GeneratePLA	GeneratePLA.cpp	/^void Mgr::GeneratePLA(std::string filename)$/;"	f	class:LogicRegression::Mgr
 Generator	RandPatGen.h	/^    Generator() { my_srandom(getpid()); }$/;"	f	class:Pattern::Generator
 Generator	RandPatGen.h	/^    Generator(unsigned seed) { my_srandom(seed); }$/;"	f	class:Pattern::Generator
 Generator	RandPatGen.h	/^class Generator$/;"	c	namespace:Pattern
 GetMemUsage	myUsage.cpp	/^double MyUsage::GetMemUsage() {$/;"	f	class:MyUsage
 GetMgr	Mgr.h	/^inline Mgr& GetMgr() { return Mgr::get_instance(); }$/;"	f	namespace:LogicRegression
 GetTimeUsage	myUsage.cpp	/^double MyUsage::GetTimeUsage() {$/;"	f	class:MyUsage
+IDENTICAL	patternBank.h	/^enum status { MERGE, NONE, IDENTICAL };$/;"	e	enum:LogicRegression::status
+IncrementalSyn	Mgr.cpp	/^void Mgr::IncrementalSyn() {$/;"	f	class:LogicRegression::Mgr
+InitABC	ABC.cpp	/^void Mgr::InitABC() {$/;"	f	class:LogicRegression::Mgr
+LogicRegression	ABC.cpp	/^namespace LogicRegression$/;"	n	file:
+LogicRegression	GenerateBLIF.cpp	/^namespace LogicRegression$/;"	n	file:
+LogicRegression	GeneratePLA.cpp	/^namespace LogicRegression$/;"	n	file:
 LogicRegression	Mgr.cpp	/^namespace LogicRegression$/;"	n	file:
 LogicRegression	Mgr.h	/^namespace LogicRegression$/;"	n
 LogicRegression	Parser.cpp	/^namespace LogicRegression$/;"	n	file:
 LogicRegression	Variable.h	/^namespace LogicRegression$/;"	n
-MASK	Mgr.h	16;"	d
-MASK	Mgr.h	17;"	d
-MAX_ENUMERATE_VAR_NUM	Mgr.h	17;"	d
-MAX_ENUMERATE_VAR_NUM	Mgr.h	18;"	d
-MAX_PATTERN_NUM	Mgr.h	20;"	d
-MIN_ENUMERATE_VAR_NUM	Mgr.h	18;"	d
-MIN_ENUMERATE_VAR_NUM	Mgr.h	19;"	d
+LogicRegression	patternBank.cpp	/^namespace LogicRegression$/;"	n	file:
+LogicRegression	patternBank.h	/^namespace LogicRegression$/;"	n
+MASK	Mgr.h	23;"	d
+MAX_ENUMERATE_VAR_NUM	Mgr.h	24;"	d
+MERGE	patternBank.h	/^enum status { MERGE, NONE, IDENTICAL };$/;"	e	enum:LogicRegression::status
+MIN_ENUMERATE_VAR_NUM	Mgr.h	25;"	d
 MYCLK_TCK	myUsage.h	21;"	d
 MYCLK_TCK	myUsage.h	22;"	d
 MY_USAGE_H	myUsage.h	10;"	d
+Merge	GenerateBLIF.cpp	/^void Mgr::Merge(std::string& base, const std::string& candidate) {$/;"	f	class:LogicRegression::Mgr
 Mgr	Mgr.h	/^    Mgr() {}$/;"	f	class:LogicRegression::Mgr
 Mgr	Mgr.h	/^class Mgr$/;"	c	namespace:LogicRegression
 MyUsage	myUsage.h	/^   MyUsage() { reset(); }$/;"	f	class:MyUsage
 MyUsage	myUsage.h	/^class MyUsage$/;"	c
+NONE	patternBank.h	/^enum status { MERGE, NONE, IDENTICAL };$/;"	e	enum:LogicRegression::status
 Pat	RandPatGen.h	/^typedef size_t Pat;$/;"	t
 Pattern	RandPatGen.h	/^namespace Pattern$/;"	n
+PatternBank	patternBank.h	/^    PatternBank() {}$/;"	f	class:LogicRegression::PatternBank
+PatternBank	patternBank.h	/^class PatternBank$/;"	c	namespace:LogicRegression
+ReadABC	ABC.cpp	/^void Mgr::ReadABC(const std::string filename){$/;"	f	class:LogicRegression::Mgr
 ReadIOGen	Parser.cpp	/^void Mgr::ReadIOGen(char* filename) {$/;"	f	class:LogicRegression::Mgr
 ReadIOInfo	Parser.cpp	/^void Mgr::ReadIOInfo(char* filename) {$/;"	f	class:LogicRegression::Mgr
 ReadIORelation	Parser.cpp	/^void Mgr::ReadIORelation(std::string filename) {$/;"	f	class:LogicRegression::Mgr
+RunAbc	ABC.cpp	/^void Mgr::RunAbc() {$/;"	f	class:LogicRegression::Mgr
 RunIOGen	Mgr.cpp	/^void Mgr::RunIOGen() const {$/;"	f	class:LogicRegression::Mgr
-RunIOGen	Mgr.cpp	/^void Mgr::RunIOGen() {$/;"	f	class:LogicRegression::Mgr
 SetID	Variable.h	/^    void SetID(VariableID i) { _id = i; }$/;"	f	struct:LogicRegression::Variable
 SetName	Variable.h	/^    void SetName(std::string s) { _name = s; }$/;"	f	struct:LogicRegression::Variable
+SetOutput	Parser.cpp	/^void Mgr::SetOutput(char* filename) {$/;"	f	class:LogicRegression::Mgr
+SimulateABC	ABC.cpp	/^void Mgr::SimulateABC(std::string filename){$/;"	f	class:LogicRegression::Mgr
+SynthesisABC	ABC.cpp	/^void Mgr::SynthesisABC(){$/;"	f	class:LogicRegression::Mgr
+TechMapABC	ABC.cpp	/^void Mgr::TechMapABC(){$/;"	f	class:LogicRegression::Mgr
 UnitPatSize	RandPatGen.h	14;"	d
 Variable	Variable.h	/^    Variable() {}$/;"	f	struct:LogicRegression::Variable
 Variable	Variable.h	/^    Variable(std::string s) { _name = s; }$/;"	f	struct:LogicRegression::Variable
 Variable	Variable.h	/^struct Variable$/;"	s	namespace:LogicRegression
 VariableID	Variable.h	/^typedef int VariableID;$/;"	t	namespace:LogicRegression
-WritePattern	Mgr.cpp	/^void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn) {$/;"	f	class:LogicRegression::Mgr
-WritePattern	Mgr.cpp	/^void Mgr::WritePattern(const std::vector<std::vector<Pat> >& refinedPatternIn, std::string filename) const {$/;"	f	class:LogicRegression::Mgr
+WritePattern	Mgr.cpp	/^void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {$/;"	f	class:LogicRegression::Mgr
+WritePattern	patternBank.cpp	/^   void PatternBank::WritePattern(std::ofstream& os) const {$/;"	f	class:LogicRegression::PatternBank
 __MGR_H__	Mgr.h	2;"	d
+__PATTERN_BANK__	patternBank.h	2;"	d
 __PATTERN_GEN_H__	RandPatGen.h	2;"	d
 __VARIABLE_H__	Variable.h	2;"	d
+_benchmark	Mgr.h	/^    std::string            _benchmark;$/;"	m	class:LogicRegression::Mgr
 _currentMem	myUsage.h	/^   double     _currentMem;$/;"	m	class:MyUsage
 _currentTick	myUsage.h	/^   double     _currentTick;$/;"	m	class:MyUsage
 _id	Variable.h	/^    VariableID  _id;$/;"	m	struct:LogicRegression::Variable
 _initMem	myUsage.h	/^   double     _initMem;$/;"	m	class:MyUsage
+_initPatNum	Mgr.h	/^    int                    _initPatNum;$/;"	m	class:LogicRegression::Mgr
 _input	Mgr.h	/^    std::vector<Variable>  _input;$/;"	m	class:LogicRegression::Mgr
 _input_variable_name_id_map	Mgr.h	/^    std::map<std::string, VariableID>  _input_variable_name_id_map;$/;"	m	class:LogicRegression::Mgr
 _iogen	Mgr.h	/^    std::string            _iogen;$/;"	m	class:LogicRegression::Mgr
 _name	Variable.h	/^    std::string _name;$/;"	m	struct:LogicRegression::Variable
 _numInput	Mgr.h	/^    int                    _numInput;$/;"	m	class:LogicRegression::Mgr
 _numOutput	Mgr.h	/^    int                    _numOutput;$/;"	m	class:LogicRegression::Mgr
+_numPat	Mgr.h	/^    int                    _numPat;$/;"	m	class:LogicRegression::Mgr
 _output	Mgr.h	/^    std::vector<Variable>  _output;$/;"	m	class:LogicRegression::Mgr
 _output_variable_name_id_map	Mgr.h	/^    std::map<std::string, VariableID>  _output_variable_name_id_map;$/;"	m	class:LogicRegression::Mgr
+_patterns	patternBank.h	/^    std::vector<std::string> _patterns;$/;"	m	class:LogicRegression::PatternBank
 _periodUsedTime	myUsage.h	/^   double     _periodUsedTime;$/;"	m	class:MyUsage
-_relation_in	Mgr.h	/^    std::vector<std::vector<Pat> > _relation_in;$/;"	m	class:LogicRegression::Mgr
-_relation_out	Mgr.h	/^    std::vector<std::vector<Pat> > _relation_out;$/;"	m	class:LogicRegression::Mgr
+_relation_in	Mgr.h	/^    std::vector<std::string > _relation_in;$/;"	m	class:LogicRegression::Mgr
+_relation_out	Mgr.h	/^    std::vector<std::string > _relation_out;$/;"	m	class:LogicRegression::Mgr
 _totalUsedTime	myUsage.h	/^   double     _totalUsedTime;$/;"	m	class:MyUsage
+_verilog_output	Mgr.h	/^    char*                  _verilog_output;$/;"	m	class:LogicRegression::Mgr
 checkMem	myUsage.h	/^   double checkMem() const {$/;"	f	class:MyUsage
 checkTick	myUsage.h	/^   double checkTick() const {$/;"	f	class:MyUsage
+check_stat	patternBank.cpp	/^   status PatternBank::check_stat(const std::string& base, const std::string& pattern) {$/;"	f	class:LogicRegression::PatternBank
+clkElapse	ABC.cpp	/^static clock_t clkElapse, clkLast;$/;"	v	file:
+clkLast	ABC.cpp	/^static clock_t clkElapse, clkLast;$/;"	v	file:
+command	ABC.cpp	/^static const char* command;$/;"	v	file:
+count_X	patternBank.cpp	/^   int PatternBank::count_X(const std::string& pat) {$/;"	f	class:LogicRegression::PatternBank
 get_instance	Mgr.h	/^    static Mgr& get_instance() { static Mgr m; return m; }$/;"	f	class:LogicRegression::Mgr
+insert	patternBank.cpp	/^   void PatternBank::insert(const std::string& pattern) {$/;"	f	class:LogicRegression::PatternBank
 main	main.cpp	/^int main(int argc, char *argv[])$/;"	f
+merge	patternBank.cpp	/^   void PatternBank::merge(std::vector<std::string>::iterator& str_it, const std::string& pattern) {$/;"	f	class:LogicRegression::PatternBank
 my_random	RandPatGen.h	11;"	d
 my_srandom	RandPatGen.h	10;"	d
 operator ()	RandPatGen.h	/^    int operator () (const int range) const { \/\/ generate int from [0 range-1]$/;"	f	class:Pattern::Generator
 operator ()	RandPatGen.h	/^    void operator () (std::vector<Pat>& patterns) {$/;"	f	class:Pattern::Generator
+pAbc	ABC.cpp	/^static Abc_Frame_t *pAbc;$/;"	v	file:
+random_sample	patternBank.cpp	/^   void PatternBank::random_sample() {$/;"	f	class:LogicRegression::PatternBank
 refinePattern	Mgr.cpp	/^void Mgr::refinePattern$/;"	f	class:LogicRegression::Mgr
-removeDuplicates	Mgr.cpp	/^void Mgr::removeDuplicates(std::vector<std::vector<Pat> >& refinedPatternIn) {$/;"	f	class:LogicRegression::Mgr
 report	myUsage.cpp	/^void MyUsage::report(bool repTime, bool repMem) {$/;"	f	class:MyUsage
 reset	myUsage.h	/^   void reset() {$/;"	f	class:MyUsage
 setMemUsage	myUsage.h	/^   void setMemUsage() { _currentMem = checkMem() - _initMem; }$/;"	f	class:MyUsage
 setTimeUsage	myUsage.h	/^   void setTimeUsage() {$/;"	f	class:MyUsage
+show	patternBank.cpp	/^   void PatternBank::show() const {$/;"	f	class:LogicRegression::PatternBank
+size	patternBank.h	/^    int    size() const { return _patterns.size(); }$/;"	f	class:LogicRegression::PatternBank
+status	patternBank.h	/^enum status { MERGE, NONE, IDENTICAL };$/;"	g	namespace:LogicRegression
 usg	main.cpp	/^MyUsage usg;$/;"	v
+visualize	patternBank.cpp	/^   void PatternBank::visualize(status stat, std::string s1, std::string s2) {$/;"	f	class:LogicRegression::PatternBank
 ~Mgr	Mgr.h	/^    ~Mgr() {}$/;"	f	class:LogicRegression::Mgr
+~PatternBank	patternBank.h	/^    ~PatternBank() {}$/;"	f	class:LogicRegression::PatternBank
 ~Variable	Variable.h	/^    ~Variable() {}$/;"	f	struct:LogicRegression::Variable

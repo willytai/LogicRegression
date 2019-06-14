@@ -11,7 +11,9 @@ void Mgr::DetermineInitParam(int estimateInputNum) {
     // determine the initial number of patterns to synthesize
     // proportional to _numInput only (one output at a time)
     _initPatNum = std::log10(estimateInputNum) / std::log10(1.2) * 600;
+    _initPatNum = std::pow(2, estimateInputNum);
     // round to a multiple of UnitPatSize for simplisity
+    /*
     int offset = 0;
     while (true) {
         if ( (_initPatNum + offset) % UnitPatSize == 0) {
@@ -24,8 +26,8 @@ void Mgr::DetermineInitParam(int estimateInputNum) {
         }
         ++offset;
     }
-    cout << "[  Mgr  ] Initial number of patterns to perform synthesis: " << _initPatNum << endl;
-    _syn_end = _initPatNum / 64;
+    */
+    cout << "Initial number of patterns: " << _initPatNum << ' ';
 }
 
 void Mgr::IncrementalSyn() {
@@ -33,8 +35,9 @@ void Mgr::IncrementalSyn() {
     // after all of the accuracy reached 99.99%
     // collect all the used patterns and perform a whole synthesis
     for (int i = 0; i < _numOutput; ++i) {
-        cout << "[  Mgr  ] Synthesis for output: " << _output[i]._name << endl;
+        cout << endl << "[  Mgr  ] Synthesis for output: " << _output[i]._name << endl;
         this->GenPattern(i);
+        this->RunAbc();
         break;
     }
 }
@@ -49,7 +52,8 @@ void Mgr::GenPattern(int PO_id) {
     PatternBank patBank;
 
     std::vector<std::pair<double, VariableID> > info;
-    this->CalInfoGain(PO_id, info);
+    this->GenRandInfo(info);
+    // this->CalInfoGain(PO_id, info);
     this->refinePattern(patBank, info);
 
     patBank.random_sample();
@@ -57,8 +61,8 @@ void Mgr::GenPattern(int PO_id) {
     this->WritePattern(patBank);
     this->RunIOGen();
     this->ReadIORelation();
-    this->GenerateBLIF(PO_id); // initial patterns
-    this->GeneratePLA(PO_id);  // patterns for simulation
+    this->GenerateBLIF(PO_id, info); // initial patterns
+    this->GeneratePLA(PO_id, info);  // patterns for simulation
 }
 
 void Mgr::GenerateInputPattern(std::string filename, int numPat) {
@@ -99,20 +103,25 @@ void Mgr::RunIOGen() const {
     std::system(("./"+_iogen+" in_pat.txt io_rel.txt").c_str());
 }
 
+void Mgr::GenRandInfo(std::vector<std::pair<double, VariableID> >& info) {
+    cout << "[  Mgr  ] sampling inputs randomly" << endl;
+    std::vector<VariableID> vec;
+    for (int i = 0; i < _numInput; ++i) vec.push_back(i);
+    std::random_shuffle(vec.begin(), vec.end());
+    for (int i = 0; i < _numInput; ++i) info.push_back(std::pair<double, VariableID>(Gen(100), vec[i]));
+}
+
 void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
-    cout << endl;
-    cout << "[  Mgr  ] Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
+    cout << "[  Mgr  ] Finding input var with great information gain in terms of " << _output[PO_id]._name << endl;
     assert(PO_id < (int)_output.size());
 
     // calculate entropy for the corresponding output
-    const std::vector<Pat>& PO_pat = _relation_out[PO_id];
+    const std::string& PO_pat = _relation_out[PO_id];
     double PO_entropy, positive = 0.0, negative = 0.0;
 
     for (int i = 0; i < (int)PO_pat.size(); ++i) {
-        for (int j = 0; j < UnitPatSize; ++j) {
-            if ( (PO_pat[i] >> j) & MASK ) ++positive;
-            else                           ++negative;
-        }
+        if ( PO_pat[i] == '1' ) ++positive;
+        else                    ++negative;
     }
     if (positive == 0.0) positive = std::numeric_limits<double>::min();
     if (negative == 0.0) negative = std::numeric_limits<double>::min();
@@ -125,25 +134,23 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
     // calculate the information gain of each input
     std::vector<std::pair<double, VariableID> > info_gain(_input.size());
     for (int child_id = 0; child_id < (int)info_gain.size(); ++child_id) {
-        const std::vector<Pat>& PI_pat = _relation_in[child_id];
+        const std::string& PI_pat = _relation_in[child_id];
         double p_child_p = 0.0, p_child_n = 0.0, n_child_p = 0.0, n_child_n = 0.0;
         for (int pat_id = 0; pat_id < (int)PO_pat.size(); ++pat_id) {
-            for (int j = 0; j < UnitPatSize; ++j) {
-                if ( (PI_pat[pat_id] >> j) & MASK ) {
-                    if ( (PO_pat[pat_id] >> j) & MASK ) {
-                        ++p_child_p;
-                    }
-                    else {
-                        ++p_child_n;
-                    }
+            if ( PI_pat[pat_id] == '1' ) {
+                if ( PO_pat[pat_id] == '1' ) {
+                    ++p_child_p;
                 }
                 else {
-                    if ( (PO_pat[pat_id] >> j) & MASK ) {
-                        ++n_child_p;
-                    }
-                    else {
-                        ++n_child_n;
-                    }
+                    ++p_child_n;
+                }
+            }
+            else {
+                if ( PO_pat[pat_id] == '1' ) {
+                    ++n_child_p;
+                }
+                else {
+                    ++n_child_n;
                 }
             }
         }
@@ -171,7 +178,7 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
 }
 
 void Mgr::refinePattern
-(PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {
+(PatternBank& patBank, std::vector<std::pair<double, VariableID> >& info) {
 
     // for visualization
     int old = patBank.size();
@@ -190,9 +197,10 @@ void Mgr::refinePattern
         }
     }
     if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
-    cout << "[  Mgr  ] Number of chosen input variables: " << partition_index << endl;
+    partition_index = 1;
+    cout << "[  Mgr  ] Number of chosen input variables: " << partition_index << ' ';
     this->DetermineInitParam(partition_index);
-    cout << "[  Mgr  ] Enumerating and combining patterns ..." << endl;
+    cout << "Enumerating and combining patterns ..." << endl;
 
     const int& chosenVarNum = partition_index;
     for (int i = 0; i < ( 1 << chosenVarNum ); ++i) {
@@ -207,6 +215,7 @@ void Mgr::refinePattern
         patBank.insert(pattern);
     }
     cout << "[  Mgr  ] " << patBank.size()-old << " additional base patterns generated." << endl;
+    info = std::vector<std::pair<double, VariableID> >(info.begin(), info.begin()+chosenVarNum);
 }
 
 void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {

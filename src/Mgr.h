@@ -22,7 +22,7 @@
 
 #define MASK 0x1
 #define MAX_ENUMERATE_VAR_NUM 10
-#define MIN_ENUMERATE_VAR_NUM 5
+#define MIN_ENUMERATE_VAR_NUM 1
 
 using std::cout;
 using std::endl;
@@ -70,15 +70,16 @@ public:
     void RunIOGen            () const;
 
     void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
-    void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
+    void GenRandInfo(std::vector<std::pair<double, VariableID> >&);
+    void refinePattern(PatternBank&, std::vector<std::pair<double, VariableID> >&);
 
     // Generate PLA file for abc
     void GeneratePLA (std::string filename = "pat.pla");
-    void GeneratePLA (int, std::string filename = "pat.pla");
+    void GeneratePLA (int, std::vector<std::pair<double, VariableID> >&, std::string filename = "pat.pla");
 
     // Generate BLIF file for abc
     void GenerateBLIF(std::string filename = "pat.blif");
-    void GenerateBLIF(int, std::string filename = "pat.blif");
+    void GenerateBLIF(int, std::vector<std::pair<double, VariableID> >&, std::string filename = "pat.blif");
     void CollectOnSetPatterns(std::vector<std::string>&, const int&); // duplicates are removed here
     void Merge(std::string&, const std::string&);
     bool DiffByOne(const std::string&, const std::string&);
@@ -96,11 +97,8 @@ private:
     // the initial number of patterns to do synthesis
     int                    _initPatNum;
 
-    // the end index of the patterns for synthesis _relation_in[id][0] ~ _relation_in[id][_syn_end-1]
-    int                    _syn_end;
-
-    std::vector<std::vector<Pat> > _relation_in;
-    std::vector<std::vector<Pat> > _relation_out;
+    std::vector<std::string > _relation_in;
+    std::vector<std::string > _relation_out;
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;

@@ -14,16 +14,17 @@ namespace LogicRegression
 {
 
    void PatternBank::random_sample() {
-     cout << "[PatBank] number of base patterns: " << _patterns.size() << endl;
-     cout << "[PatBank] sampling patterns ..." << endl;
+     cout << "[PatBank] number of base patterns: " << _patterns.size() << ' ';
+     cout << "sampling patterns ..." << ' ';
 
      // shuffle the patterns fisrt
-     std::random_shuffle(_patterns.begin(), _patterns.end());
+     // std::random_shuffle(_patterns.begin(), _patterns.end());
 
+     std::vector<std::string> use;
      std::vector<std::string> sample;
      for (int i = 0; i < (int)_patterns.size(); ++i) {
         int unkown = this->count_X(_patterns[i]);
-        int expand_num = ( unkown == 0 ? 1 : std::log10( std::pow(2, unkown) ) / std::log10( 1.03 ) );
+        int expand_num = ( unkown == 0 ? 2 : std::log10( std::pow(2, unkown) ) / std::log10( 1.03 ) );
         // cout << "sampling " << expand_num << " patterns with " << unkown << " unkown inputs" << endl;
         for (int j = 0; j < expand_num; ++j) {
            std::string newPat(_patterns[i]);
@@ -31,14 +32,17 @@ namespace LogicRegression
                if (newPat[bit] != 'X') continue;
                newPat[bit] = ( Gen(2) == 1 ? '1' : '0' );
            }
-           sample.push_back(newPat);
+           if (!j) use.push_back(newPat);
+           else    sample.push_back(newPat);
         }
      }
-     _patterns.swap(sample);
+     // std::random_shuffle(sample.begin(), sample.end());
+     use.insert(use.end(), sample.begin(), sample.end());
+     _patterns.swap(use);
 
      // shuffle again
-     std::random_shuffle(_patterns.begin(), _patterns.end());
-     cout << "[PatBank] " << size() << " patterns sampled." << endl;
+     // std::random_shuffle(_patterns.begin(), _patterns.end());
+     cout << size() << " patterns sampled." << endl;
    }
 
    void PatternBank::insert(const std::string& pattern) {
