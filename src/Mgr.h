@@ -21,8 +21,7 @@
 #endif
 
 #define MASK 0x1
-#define MAX_ENUMERATE_VAR_NUM 10
-#define MIN_ENUMERATE_VAR_NUM 6
+#define MAX_ENUMERATE_VAR_NUM 16
 
 using std::cout;
 using std::endl;
@@ -68,8 +67,9 @@ public:
     void RunIOGen            () const;
 
     void FindDependentInput();
+    void Enumerate();
     // void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
-    void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
+    // void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
     // Generate PLA file for abc
     void GeneratePLA (std::string filename = "pat.pla");

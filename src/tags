@@ -10,6 +10,7 @@ Abc_Frame_t	ABC.cpp	/^typedef struct Abc_Frame_t_ Abc_Frame_t;$/;"	t	namespace:A
 CollectOnSetPatterns	GenerateBLIF.cpp	/^void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO_id) {$/;"	f	class:LogicRegression::Mgr
 DiffByOne	GenerateBLIF.cpp	/^bool Mgr::DiffByOne(const std::string& s1, const std::string& s2) {$/;"	f	class:LogicRegression::Mgr
 EndABC	ABC.cpp	/^void Mgr::EndABC(){$/;"	f	class:LogicRegression::Mgr
+Enumerate	Mgr.cpp	/^void Mgr::Enumerate() {$/;"	f	class:LogicRegression::Mgr
 FindDependentInput	Mgr.cpp	/^void Mgr::FindDependentInput() {$/;"	f	class:LogicRegression::Mgr
 GenPattern	Mgr.cpp	/^void Mgr::GenPattern() {$/;"	f	class:LogicRegression::Mgr
 GenerateBLIF	GenerateBLIF.cpp	/^void Mgr::GenerateBLIF(std::string filename) {$/;"	f	class:LogicRegression::Mgr
@@ -33,9 +34,7 @@ LogicRegression	Variable.h	/^namespace LogicRegression$/;"	n
 LogicRegression	patternBank.cpp	/^namespace LogicRegression$/;"	n	file:
 LogicRegression	patternBank.h	/^namespace LogicRegression$/;"	n
 MASK	Mgr.h	23;"	d
-MAX_ENUMERATE_VAR_NUM	Mgr.h	24;"	d
 MERGE	patternBank.h	/^enum status { MERGE, NONE, IDENTICAL };$/;"	e	enum:LogicRegression::status
-MIN_ENUMERATE_VAR_NUM	Mgr.h	25;"	d
 MYCLK_TCK	myUsage.h	21;"	d
 MYCLK_TCK	myUsage.h	22;"	d
 MY_USAGE_H	myUsage.h	10;"	d
@@ -113,7 +112,6 @@ operator ()	RandPatGen.h	/^    void operator () (std::vector<Pat>& patterns) {$/
 operator ()	RandPatGen.h	/^    void operator() (std::string& pat) {$/;"	f	class:Pattern::Generator
 pAbc	ABC.cpp	/^static Abc_Frame_t *pAbc;$/;"	v	file:
 random_sample	patternBank.cpp	/^   void PatternBank::random_sample() {$/;"	f	class:LogicRegression::PatternBank
-refinePattern	Mgr.cpp	/^void Mgr::refinePattern$/;"	f	class:LogicRegression::Mgr
 report	myUsage.cpp	/^void MyUsage::report(bool repTime, bool repMem) {$/;"	f	class:MyUsage
 reset	myUsage.h	/^   void reset() {$/;"	f	class:MyUsage
 setMemUsage	myUsage.h	/^   void setMemUsage() { _currentMem = checkMem() - _initMem; }$/;"	f	class:MyUsage

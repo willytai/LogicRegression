@@ -12,19 +12,20 @@ void Mgr::GenPattern() {
     this->RunIOGen();
     this->ReadIORelation();
     this->FindDependentInput();
-    exit(0);
-
-    PatternBank patBank;
-
-    for (int i = 0; i < (int)_output.size(); ++i) {
-        std::vector<std::pair<double, VariableID> > info;
-        // this->CalInfoGain(i, info);
-        this->refinePattern(patBank, info);
-    }
-    patBank.random_sample();
-    this->WritePattern(patBank);
+    this->Enumerate();
     this->RunIOGen();
     this->ReadIORelation();
+    exit(0);
+
+    // PatternBank patBank;
+
+    // for (int i = 0; i < (int)_output.size(); ++i) {
+        // std::vector<std::pair<double, VariableID> > info;
+        // this->CalInfoGain(i, info);
+        // this->refinePattern(patBank, info);
+    // }
+    // patBank.random_sample();
+
     this->GenerateBLIF(); // initial patterns
     this->GeneratePLA();  // patterns for simulation
 }
@@ -106,6 +107,35 @@ void Mgr::FindDependentInput() {
     cout << endl;
 }
 
+void Mgr::Enumerate() {
+    cout << "[  Mgr  ] Enumerating patterns ... ";
+    PatternBank patBank;
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        int nDependent = _fanins[PO_id].size();
+        if (nDependent <= MAX_ENUMERATE_VAR_NUM) { // enumerate
+            for (int i = 0; i < (1 << nDependent); ++i) {
+                std::string newPat(_numInput, 'X');
+                for (int dep_id = 0; dep_id < nDependent; ++dep_id) {
+                    bool v = ( (i >> dep_id) & MASK );
+                    if (v) newPat[_fanins[PO_id][dep_id]] = '1';
+                    else   newPat[_fanins[PO_id][dep_id]] = '0';
+                }
+                for (int bit = 0; bit < (int)newPat.size(); ++bit) {
+                    if (newPat[bit] != 'X') continue;
+                    if (Gen(2)) newPat[bit] = '1';
+                    else        newPat[bit] = '0';
+                }
+                patBank.insert(newPat);
+            }
+        }
+        else { // sample
+
+        }
+    }
+    this->WritePattern(patBank);
+    cout << patBank.size() << " patterns enumearted." << endl;
+}
+
 /*
 void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
     cout << endl;
@@ -177,7 +207,6 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
     std::sort(info_gain.begin(), info_gain.end(), std::greater<std::pair<double, VariableID> >());
     info.swap(info_gain);
 }
-*/
 
 void Mgr::refinePattern
 (PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {
@@ -216,6 +245,7 @@ void Mgr::refinePattern
     }
     cout << "[  Mgr  ] " << patBank.size()-old << " additional base patterns generated." << endl;
 }
+*/
 
 void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {
     std::ofstream file;
