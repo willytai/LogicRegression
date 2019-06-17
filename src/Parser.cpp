@@ -33,15 +33,12 @@ void Mgr::ReadIOInfo(char* filename) {
         _output_variable_name_id_map[buffer] = _output.size() - 1;
     }
 
-    cout << "[ Parser] Input  Variables (" << _numInput << "):";
-    for (int i = 0; i < _numInput; ++i) cout << ' ' << _input[i]._name;
+    cout << "[ Parser] Input  Variables (" << _numInput << ")";
+    // for (int i = 0; i < _numInput; ++i) cout << ' ' << _input[i]._name;
     cout << endl;
-    cout << "[ Parser] Output Variables (" << _numOutput << "):";
-    for (int i = 0; i < _numOutput; ++i) cout << ' ' << _output[i]._name;
+    cout << "[ Parser] Output Variables (" << _numOutput << ")";
+    // for (int i = 0; i < _numOutput; ++i) cout << ' ' << _output[i]._name;
     cout << endl;
-
-    _relation_in.resize(_numInput);
-    _relation_out.resize(_numOutput);
 }
 
 void Mgr::ReadIOGen(char* filename) {
