@@ -15,7 +15,6 @@ void Mgr::GenPattern() {
     this->Enumerate();
     this->RunIOGen();
     this->ReadIORelation();
-    exit(0);
 
     // PatternBank patBank;
 
@@ -75,9 +74,9 @@ void Mgr::GenerateInputPattern(std::string filename) {
     file.close();
 }
 
-void Mgr::RunIOGen() const {
+void Mgr::RunIOGen(std::string in_pat, std::string io_rel) const {
     cout << "[  Mgr  ] Generating relation from " << _iogen << " ..." << endl;
-    std::system(("./"+_iogen+" in_pat.txt io_rel.txt").c_str());
+    std::system(("./"+_iogen+" "+in_pat+" "+io_rel).c_str());
 }
 
 void Mgr::FindDependentInput() {
@@ -108,7 +107,8 @@ void Mgr::FindDependentInput() {
 }
 
 void Mgr::Enumerate() {
-    cout << "[  Mgr  ] Enumerating patterns ... ";
+    // this is for debugging
+    _few_fanin_mask.clear(); _few_fanin_mask.resize(_numOutput, true);
     PatternBank patBank;
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
         int nDependent = _fanins[PO_id].size();
@@ -128,12 +128,14 @@ void Mgr::Enumerate() {
                 patBank.insert(newPat);
             }
         }
-        else { // sample
-
+        else { // primary outputs that conatin too many fanins are ignored for now
+            _few_fanin_mask[PO_id] = false;
         }
+        cout << '\r' << std::flush;
+        cout << "[  Mgr  ] Enumerating patterns ... " << patBank.size() << " patterns enumearted." << std::flush;
     }
     this->WritePattern(patBank);
-    cout << patBank.size() << " patterns enumearted." << endl;
+    cout << endl;
 }
 
 /*

@@ -20,11 +20,13 @@ void Mgr::GenerateBLIF(std::string filename) {
     /* output variable names in order */
     blifFile << ".outputs";
     for (int i = 0; i < _numOutput; ++i) {
+        if (!_few_fanin_mask[i]) continue;
         blifFile << ' ' << _output[i]._name;
     }
     blifFile << endl;
 
     for (int i = 0; i < _numOutput; ++i) {
+        if (!_few_fanin_mask[i]) continue;
         std::vector<std::string> patterns;
         this->CollectOnSetPatterns(patterns, i);
         if (patterns.size()) {
@@ -45,23 +47,9 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
     cout << "[  Mgr  ] Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
 
     // collect patterns
-    int count = 0;
-    // only batches for synthesis
-    for (int batch = 0; batch < _syn_end; ++batch) {
-        for (int shift = 0; shift < UnitPatSize; ++shift) {
-            if ( !( ( _relation_out[PO_id][batch] >> shift ) & MASK ) ) {
-                ++count;
-                continue;
-            }
-            std::string temp(_numInput, '-');
-            for (int i = 0; i < _numInput; ++i) {
-                if ( ( _relation_in[i][batch] >> shift ) & MASK ) temp[i] = '1';
-                else temp[i] = '0';
-            }
-            patterns.push_back(temp);
-            if ( ++count == _numPat ) break;
-        }
-        if ( count == _numPat ) break;
+    for (int pat_id = 0; pat_id < _numPat; ++pat_id) {
+        if (_relation_out[pat_id][PO_id] == '0') continue;
+        else patterns.push_back(_relation_in[pat_id]);
     }
 
     // merge patterns that only differ by 1 bit

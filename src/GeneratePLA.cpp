@@ -1,62 +1,51 @@
 #include "Mgr.h"
 
-/*
- * PLA file format
- * .i input_number
- * .o output_number
- * .ilb input_name
- * .ob output_name
- * .p pattern number
- * input_pattern output_pattern
- * .e 
- */
-
+extern Pattern::Generator Gen;
 
 namespace LogicRegression
 {
+
 void Mgr::GeneratePLA(std::string filename)
 {
-/* Define the function which generate PLA file for abc from pattern */
-    cout << "[  Mgr  ] creating PLA file from random pattern" << endl;
-    std::ofstream plaFile;
-    plaFile.open(filename.c_str());
-    /* plaFile << "# created by random simulated pattern " << endl; */
-    /* specify input number */
-    /* plaFile << ".i " << _numInput << endl; */
-    /* specify output number */
-    /* plaFile << ".o " << _numOutput << endl; */
-    /* specify input variable name */
-    /* plaFile << ".ilb "; */
-    /* for (int id = 0; id < _numInput; ++id) plaFile << _input[id]._name << ' '; */
-    /* plaFile << endl; */
-    /* specify output varaible name */
-    /* plaFile << ".ob "; */
-    /* for (int id = 0; id < _numOutput; ++id) plaFile << _output[id]._name << ' '; */
-    /* plaFile << endl; */
-    /* specify pattern number */
-    /* specify input_pattern & output_pattern */    
-    const int& size = _numPat;
-    cout << "[  Mgr  ] total patterns = " << size << endl;
-    /* plaFile << ".p " << size << endl; */
-    int count = 0;
-    // only the batches for simulation
-    for (int batch = _syn_end; batch < (int)_relation_in[0].size(); ++batch) {
-        for (int shift = 0; shift < UnitPatSize; ++shift) {
-            for (int input_id = 0; input_id < _numInput; ++input_id) {
-                plaFile << ( ( _relation_in[input_id][batch] >> shift ) & MASK );
-            }
-            plaFile << ' ';
-            for (int output_id = 0; output_id < _numOutput; ++output_id) {
-                plaFile << ( ( _relation_out[output_id][batch] >> shift ) & MASK );
-            }
-            plaFile << endl;
-            if ( ++count == size ) break;
-        }
-        if ( count == size ) break;
+    /* Define the function which generate PLA file for abc from pattern */
+    /* Generates 100000 patterns for simulation, getting less than 10 errors would pass the baseline */
+    cout << "[  Mgr  ] Random sampling 100000 patterns for testing ..." << endl;
+    std::ofstream file; file.open("test_pat.txt");
+    file << _numInput << ' ' << 100000 << endl;
+    for (int i = 0; i < (int)_input.size(); ++i) {
+        file << _input[i]._name;
+        if (i < (int)_input.size()-1) file << ' ';
     }
-    /* specify end of file */
-    /* plaFile << ".e" << endl; */
-    cout << "[  Mgr  ] creating PLA file done" << endl;
+    file << endl;
+    std::string newPat(_numInput, 'X');
+    for (int i = 0; i < 100000; ++i) {
+        Gen(newPat);
+        for (int bit = 0; bit < (int)newPat.length(); ++bit) {
+            file << newPat[bit];
+            if (bit < (int)newPat.length()-1) file << ' ';
+        }
+        file << endl;
+    }
+    file.close();
+
+    this->RunIOGen("test_pat.txt", "test_rel.txt");
+    this->ReadIORelation("test_rel.txt");
+
+    cout << "[  Mgr  ] Writing to PLA file ... " << std::flush;
+
+    file.open(filename);
+    for (int pat_id = 0; pat_id < _numPat; ++pat_id) {
+        std::string out;
+        for (int PO_id = 0; PO_id < (int)_relation_out[pat_id].size(); ++PO_id) {
+            if (!_few_fanin_mask[PO_id]) continue;
+            out.push_back(_relation_out[pat_id][PO_id]);
+        }
+        file << _relation_in[pat_id] << ' ' << out << endl;
+    }
+    file.close();
+ 
+    cout << "complete." << endl;
 }
+
 /* end of namespace */
 }

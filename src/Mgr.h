@@ -21,7 +21,7 @@
 #endif
 
 #define MASK 0x1
-#define MAX_ENUMERATE_VAR_NUM 16
+#define MAX_ENUMERATE_VAR_NUM 13
 
 using std::cout;
 using std::endl;
@@ -64,7 +64,7 @@ public:
     void GenerateInputPattern(std::string filename = "in_pat.txt");
     void WritePattern        (const PatternBank&, std::string filename = "in_pat.txt") const;
     void ReadIORelation      (std::string filename = "io_rel.txt");
-    void RunIOGen            () const;
+    void RunIOGen            (std::string in_pat = "in_pat.txt", std::string io_rel = "io_rel.txt") const;
 
     void FindDependentInput();
     void Enumerate();
@@ -103,6 +103,9 @@ private:
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
+
+    // this is just for debugging
+    std::vector<bool>        _few_fanin_mask;
 
     // ABC frame work
     inline void AbcError(const char* command) {
