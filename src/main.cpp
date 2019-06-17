@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     LogicRegression::GetMgr().ReadIOInfo(argv[1]);
     LogicRegression::GetMgr().ReadIOGen(argv[2]);
     LogicRegression::GetMgr().SetOutput(argv[3]);
-    LogicRegression::GetMgr().DetermineInitParam();
     LogicRegression::GetMgr().GenPattern();
     LogicRegression::GetMgr().RunAbc();
 

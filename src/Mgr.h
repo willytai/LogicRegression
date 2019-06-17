@@ -46,7 +46,6 @@ public:
     void ReadIOGen         (char*);
     void SetOutput         (char*);
     void GenPattern        ();
-    void DetermineInitParam();
     void RunAbc            ();
 
     /*******************/
@@ -63,7 +62,7 @@ public:
     /* IO for gnenrator */
     /********************/
     // random generate
-    void GenerateInputPattern(std::string filename = "in_pat.txt", int numPat = 64);
+    void GenerateInputPattern(std::string filename = "in_pat.txt");
     void WritePattern        (const PatternBank&, std::string filename = "in_pat.txt") const;
     void ReadIORelation      (std::string filename = "io_rel.txt");
     void RunIOGen            () const;

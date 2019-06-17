@@ -7,31 +7,8 @@ extern MyUsage usg;
 namespace LogicRegression
 {
 
-void Mgr::DetermineInitParam() {
-    // determine the initial number of patterns to synthesize
-    // proportional to _numInput and _numOutput
-    _initPatNum = std::log10(_numInput * _numOutput) / std::log10(1.2) * 600;
-    // round to a multiple of UnitPatSize for simplisity
-    int offset = 0;
-    while (true) {
-        if ( (_initPatNum + offset) % UnitPatSize == 0) {
-            _initPatNum += offset;
-            break;
-        }
-        if ( (_initPatNum - offset) % UnitPatSize == 0) {
-            _initPatNum -= offset;
-            break;
-        }
-        ++offset;
-    }
-    cout << "[  Mgr  ] Initial number of patterns to perform synthesis: " << _initPatNum << endl;
-    _syn_end = _initPatNum / 64;
-}
-
 void Mgr::GenPattern() {
-    int initPatNumFactor = 20;
-    cout << "[  Mgr  ] Generating " << _numInput*UnitPatSize*initPatNumFactor << " relations to calculate information gain" << endl;
-    this->GenerateInputPattern("in_pat.txt", _numInput*UnitPatSize*initPatNumFactor);
+    this->GenerateInputPattern("in_pat.txt");
     this->RunIOGen();
     this->ReadIORelation();
 
@@ -50,7 +27,13 @@ void Mgr::GenPattern() {
     this->GeneratePLA();  // patterns for simulation
 }
 
-void Mgr::GenerateInputPattern(std::string filename, int numPat) {
+void Mgr::GenerateInputPattern(std::string filename) {
+    // ex:
+    // 0000000 0000000
+    // 1000000 0100000
+    int fixPat = log2(_numInput-1) * 100;
+    int numPat = 2 * _numInput * fixPat;
+    cout << "[  Mgr  ] Generating " << numPat << " patterns that differ by one bit ..." << endl;
     std::ofstream file;
     file.open(filename.c_str());
 
@@ -66,19 +49,25 @@ void Mgr::GenerateInputPattern(std::string filename, int numPat) {
     }
     file << endl;
 
-    std::vector<Pat> patterns; patterns.resize(_numInput);
-    int count = 0;
-    while (count < numPat) {
-        Gen(patterns);
-        for (int i = 0; i < UnitPatSize; ++i) {
-            for (int j = 0; j < _numInput; ++j) {
-                file << (patterns[j] & MASK);
-                patterns[j] = patterns[j] >> 1;
-                if (j < _numInput-1) file << ' ';
+    for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+        for (int i = 0; i < fixPat; ++i) {
+            std::string pat(_numInput, 'X');
+            Gen(pat);
+            // the '0' pattern
+            for (int bit = 0; bit < (int)pat.length(); ++bit) {
+                if (bit == PI_id) file << '0';
+                else              file << pat[bit];
+                if (bit < (int)pat.length()-1) file << ' ';
+            }
+            file << endl;
+            // the '1' pattern
+            for (int bit = 0; bit < (int)pat.length(); ++bit) {
+                if (bit == PI_id) file << '1';
+                else              file << pat[bit];
+                if (bit < (int)pat.length()-1) file << ' ';
             }
             file << endl;
         }
-    count += UnitPatSize;
     }
     file.close();
 }

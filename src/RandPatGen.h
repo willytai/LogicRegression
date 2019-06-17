@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <vector>
+#include <string>
 
 #define my_srandom srandom
 #define my_random  random
@@ -24,6 +25,13 @@ public:
 
     int operator () (const int range) const { // generate int from [0 range-1]
         return int(range * (double(my_random()) / INT_MAX));
+    }
+
+    void operator() (std::string& pat) {
+        for (int i = 0; i < (int)pat.length(); ++i) {
+            if ((*this)(2)) pat[i] = '1';
+            else            pat[i] = '0';
+        }
     }
 
     void operator () (std::vector<Pat>& patterns) {
