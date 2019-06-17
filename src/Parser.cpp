@@ -93,10 +93,6 @@ void Mgr::ReadIORelation(std::string filename) {
         ++relCount;
     }
     _numPat = numRelation;
-
-    for (int i = 0; i < 10; ++i) {
-        cout << _relation_in[i] << ' ' << _relation_out[i] << endl;
-    }
 }
 
 }

@@ -11,6 +11,8 @@ void Mgr::GenPattern() {
     this->GenerateInputPattern("in_pat.txt");
     this->RunIOGen();
     this->ReadIORelation();
+    this->FindDependentInput();
+    exit(0);
 
     PatternBank patBank;
 
@@ -75,6 +77,33 @@ void Mgr::GenerateInputPattern(std::string filename) {
 void Mgr::RunIOGen() const {
     cout << "[  Mgr  ] Generating relation from " << _iogen << " ..." << endl;
     std::system(("./"+_iogen+" in_pat.txt io_rel.txt").c_str());
+}
+
+void Mgr::FindDependentInput() {
+    cout << "[  Mgr  ] Searching for dependent inputs for every output ..." << endl;
+    // for every output, find the dependent input by the diff-by-1 patterns
+    _fanins.resize(_numOutput);
+    for (int pat_id = 0; pat_id < _numPat; pat_id += 2) {
+        const std::string& in_pat_1 = _relation_in[pat_id];
+        const std::string& in_pat_2 = _relation_in[pat_id+1];
+        const std::string& out_pat_1 = _relation_out[pat_id];
+        const std::string& out_pat_2 = _relation_out[pat_id+1];
+        for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+            if (out_pat_1[PO_id] == out_pat_2[PO_id]) continue;
+            for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+                if (in_pat_1[PI_id] == in_pat_2[PI_id]) continue;
+                auto it = std::find(_fanins[PO_id].begin(), _fanins[PO_id].end(), PI_id);
+                if (it == _fanins[PO_id].end()) _fanins[PO_id].push_back(PI_id);
+                break;
+            }
+        }
+    }
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        cout << _output[PO_id]._name << "'s fanins(" << _fanins[PO_id].size() << "):";
+        for (int i = 0; i < (int)_fanins[PO_id].size(); ++i) cout << ' ' << _input[_fanins[PO_id][i]]._name;
+        cout << endl;
+    }
+    cout << endl;
 }
 
 /*

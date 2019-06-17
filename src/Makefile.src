@@ -19,8 +19,8 @@ CONTRAOL_FLAGS = -DPARALLEL
 ABCFLAG = ../lib/libabc.a -lm -ldl -lreadline -lpthread
 
 #Og optimizes debug experience
-CFLAGS = -Og -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
-CFLAGS = -O3 -Wall -fopenmp $(CONTRAOL_FLAGS)
+CFLAGS = -std=c++11 -O3 -Wall -fopenmp $(CONTRAOL_FLAGS)
+CFLAGS = -std=c++11 -Wall -g $(DEBUG_FLAGS) $(CONTRAOL_FLAGS)
 
 
 .PHONY: depend

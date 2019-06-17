@@ -67,6 +67,7 @@ public:
     void ReadIORelation      (std::string filename = "io_rel.txt");
     void RunIOGen            () const;
 
+    void FindDependentInput();
     // void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
@@ -86,8 +87,9 @@ private:
     std::string            _iogen;
     int                    _numInput;
     int                    _numOutput;
-    int                    _numPat;
     char*                  _verilog_output;
+
+    std::vector<std::vector<VariableID> > _fanins; // _fanins[0] would be the fanins of output ID 0
 
     // the initial number of patterns to do synthesis
     int                    _initPatNum;
@@ -97,6 +99,7 @@ private:
 
     std::vector<std::string> _relation_in;
     std::vector<std::string> _relation_out;
+    int                      _numPat; // the total patterns in _relation_in/_relation_out
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
