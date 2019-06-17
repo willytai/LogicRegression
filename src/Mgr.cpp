@@ -16,7 +16,7 @@ void Mgr::GenPattern() {
 
     for (int i = 0; i < (int)_output.size(); ++i) {
         std::vector<std::pair<double, VariableID> > info;
-        this->CalInfoGain(i, info);
+        // this->CalInfoGain(i, info);
         this->refinePattern(patBank, info);
     }
     patBank.random_sample();
@@ -77,6 +77,7 @@ void Mgr::RunIOGen() const {
     std::system(("./"+_iogen+" in_pat.txt io_rel.txt").c_str());
 }
 
+/*
 void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
     cout << endl;
     cout << "[  Mgr  ] Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
@@ -147,6 +148,7 @@ void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID>
     std::sort(info_gain.begin(), info_gain.end(), std::greater<std::pair<double, VariableID> >());
     info.swap(info_gain);
 }
+*/
 
 void Mgr::refinePattern
 (PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {

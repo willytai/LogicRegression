@@ -55,17 +55,15 @@ void Mgr::ReadIORelation(std::string filename) {
 
     _relation_in.clear();
     _relation_out.clear();
-    _relation_in.resize(_numInput);
-    _relation_out.resize(_numOutput);
 
     int numRelation;
     std::ifstream file;
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
-    int TotalPat = numRelation / UnitPatSize;
-    if (numRelation%UnitPatSize) ++TotalPat;
-    for (int i = 0; i < _numInput; ++i) _relation_in[i].resize(TotalPat);
-    for (int i = 0; i < _numOutput; ++i) _relation_out[i].resize(TotalPat);
+    _relation_in.resize(numRelation);
+    _relation_out.resize(numRelation);
+    for (int i = 0; i < (int)_relation_in.size(); ++i) _relation_in[i].resize((_numInput), 'X');
+    for (int i = 0; i < (int)_relation_out.size(); ++i) _relation_out[i].resize((_numOutput), 'X');
 
     std::vector<std::string> variableNames;
     std::string buffer;
@@ -75,48 +73,30 @@ void Mgr::ReadIORelation(std::string filename) {
     }
 
     int relCount = 0;
-    std::vector<Pat> temp((_numInput + _numOutput), 0);
     while (relCount < numRelation) {
-        for (int i = 0; i < (int)temp.size(); ++i) {
-            temp[i] = temp[i] << 1;
-            int value;
-            file >> value;
-            temp[i] += value;
-        }
-        if (++relCount % UnitPatSize == 0) {
-            for (int i = 0; i < (int)temp.size(); ++i) {
-                std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
-                if (it == _input_variable_name_id_map.end()) {
-                    it = _output_variable_name_id_map.find(variableNames[i]);
-                    VariableID id = (*it).second;
-                    _relation_out[id][relCount/UnitPatSize-1] = temp[i];
-                }
-                else {
-                    VariableID id = (*it).second;
-                    _relation_in[id][relCount/UnitPatSize-1] = temp[i];
-                }
-            }
-            temp.clear();
-            temp.resize((_numInput + _numOutput), 0);
-        }
-    }
+        for (int bit = 0; bit < (_numInput + _numOutput) ; ++bit) {
+            char v;
+            file >> v;
 
-    if ( relCount % UnitPatSize != 0 ) {
-        for (int i = 0; i < (int)temp.size(); ++i) {
-            std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[i]);
+            std::map<std::string, VariableID>::iterator it = _input_variable_name_id_map.find(variableNames[bit]);
+
             if (it == _input_variable_name_id_map.end()) {
-                it = _output_variable_name_id_map.find(variableNames[i]);
+                it = _output_variable_name_id_map.find(variableNames[bit]);
                 VariableID id = (*it).second;
-                _relation_out[id][relCount/UnitPatSize] = temp[i];
+                _relation_out[relCount][id] = v;
             }
             else {
                 VariableID id = (*it).second;
-                _relation_in[id][relCount/UnitPatSize] = temp[i];
+                _relation_in[relCount][id] = v;
             }
         }
+        ++relCount;
     }
-
     _numPat = numRelation;
+
+    for (int i = 0; i < 10; ++i) {
+        cout << _relation_in[i] << ' ' << _relation_out[i] << endl;
+    }
 }
 
 }

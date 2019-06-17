@@ -67,7 +67,7 @@ public:
     void ReadIORelation      (std::string filename = "io_rel.txt");
     void RunIOGen            () const;
 
-    void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
+    // void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
     void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
 
     // Generate PLA file for abc
@@ -95,8 +95,8 @@ private:
     // the end index of the patterns for synthesis _relation_in[id][0] ~ _relation_in[id][_syn_end-1]
     int                    _syn_end;
 
-    std::vector<std::vector<Pat> > _relation_in;
-    std::vector<std::vector<Pat> > _relation_out;
+    std::vector<std::string> _relation_in;
+    std::vector<std::string> _relation_out;
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
