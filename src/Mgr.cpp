@@ -108,7 +108,7 @@ void Mgr::FindDependentInput() {
 
 void Mgr::Enumerate() {
     // this is for debugging
-    _few_fanin_mask.clear(); _few_fanin_mask.resize(_numOutput, true);
+    _few_fanin_mask.clear(); _few_fanin_mask.resize(_numOutput, false);
     PatternBank patBank;
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
         int nDependent = _fanins[PO_id].size();
@@ -127,6 +127,7 @@ void Mgr::Enumerate() {
                 }
                 patBank.insert(newPat);
             }
+            _few_fanin_mask[PO_id] = true;
         }
         else { // primary outputs that conatin too many fanins are ignored for now
             _few_fanin_mask[PO_id] = false;

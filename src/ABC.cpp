@@ -33,9 +33,9 @@ using namespace ABC_NAMESPACE;
 #endif
 
 // framework variables
-static Abc_Frame_t *pAbc;
-static clock_t clkElapse, clkLast;
-static const char* command;
+Abc_Frame_t *pAbc;
+clock_t clkElapse, clkLast;
+const char* command;
 
 namespace LogicRegression
 {
@@ -198,7 +198,12 @@ void Mgr::SimulateABC(std::string filename){
 	cout << "[  ABC  ] Start simulation: " << endl;
 	clkLast = clock();
     command = ("sim_aig " + filename).c_str();
-    if (Cmd_CommandExecute( pAbc, command )) this->AbcError(command);
+    std::string test(command);
+    if (Cmd_CommandExecute( pAbc, command )) {
+        std::string fuck(command);
+        assert(fuck == test);
+        this->AbcError(command);
+    }
     clkElapse = clock() - clkLast;
     clkLast += clkElapse;
     cout << "[  ABC  ] simulation: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << " sec" << endl; 

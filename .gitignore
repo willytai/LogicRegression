@@ -14,5 +14,6 @@ lrg
 
 *tags
 
-*circuit.v
+*.v
 
+*.size

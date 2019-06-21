@@ -51,6 +51,18 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
         if (_relation_out[pat_id][PO_id] == '0') continue;
         else patterns.push_back(_relation_in[pat_id]);
     }
+    for (int pat_id = 0; pat_id < (int)patterns.size(); ++pat_id) {
+        for (int bit = 0; bit < (int)patterns[pat_id].size(); ++bit) {
+            bool check = false;
+            for (int i = 0; i < (int)_fanins[PO_id].size(); ++i) {
+                if (_fanins[PO_id][i] == bit) {
+                    check = true;
+                    break;
+                }
+            }
+            if (!check) patterns[pat_id][bit] = '-';
+        }
+    }
 
     // merge patterns that only differ by 1 bit
     // repeat until no merges can be found
