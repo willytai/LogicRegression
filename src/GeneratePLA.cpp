@@ -8,30 +8,9 @@ namespace LogicRegression
 void Mgr::GeneratePLA(std::string filename)
 {
     /* Define the function which generate PLA file for abc from pattern */
-    /* Generates 100000 patterns for simulation, getting less than 10 errors would pass the baseline */
-    cout << "[  Mgr  ] Random sampling 100000 patterns for testing ..." << endl;
-    std::ofstream file; file.open("test_pat.txt");
-    file << _numInput << ' ' << 100000 << endl;
-    for (int i = 0; i < (int)_input.size(); ++i) {
-        file << _input[i]._name;
-        if (i < (int)_input.size()-1) file << ' ';
-    }
-    file << endl;
-    std::string newPat(_numInput, 'X');
-    for (int i = 0; i < 100000; ++i) {
-        Gen(newPat);
-        for (int bit = 0; bit < (int)newPat.length(); ++bit) {
-            file << newPat[bit];
-            if (bit < (int)newPat.length()-1) file << ' ';
-        }
-        file << endl;
-    }
-    file.close();
-
-    this->RunIOGen("test_pat.txt", "test_rel.txt");
-    this->ReadIORelation("test_rel.txt");
-
     cout << "[  Mgr  ] Writing to PLA file ... " << std::flush;
+
+    std::ofstream file;
 
     file.open(filename);
     for (int pat_id = 0; pat_id < _numPat; ++pat_id) {

@@ -44,8 +44,9 @@ void Mgr::RunAbc() {
     this->InitABC();
     this->ReadABC();
     this->SynthesisABC();
-	this->SimulateABC();
+    this->SimulateABC();
     this->TechMapABC();
+    this->DumpVerilog();
     this->EndABC();
 }
 
@@ -224,7 +225,9 @@ void Mgr::TechMapABC(){
     clkLast += clkElapse;
     cout << "[  ABC  ] Technology mapping: " << (float)(clkElapse) / (float)(CLOCKS_PER_SEC) << "sec" << endl;
     cout << "[  ABC  ] End Technology mapping" << endl;
+}
 
+void Mgr::DumpVerilog() {
     // Output Verilog
     command = ("write_verilog " + std::string(_verilog_output)).c_str();
     if (Cmd_CommandExecute(pAbc, command)) this->AbcError(command);

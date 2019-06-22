@@ -8,6 +8,7 @@ namespace LogicRegression
 {
 
 void Mgr::GenPattern() {
+    this->GenerateTestPatterns();
     this->GenerateInputPattern("in_pat.txt");
     this->RunIOGen();
     this->ReadIORelation();
@@ -15,18 +16,33 @@ void Mgr::GenPattern() {
     this->Enumerate();
     this->RunIOGen();
     this->ReadIORelation();
-
-    // PatternBank patBank;
-
-    // for (int i = 0; i < (int)_output.size(); ++i) {
-        // std::vector<std::pair<double, VariableID> > info;
-        // this->CalInfoGain(i, info);
-        // this->refinePattern(patBank, info);
-    // }
-    // patBank.random_sample();
-
-    this->GenerateBLIF(); // initial patterns
+    this->GenerateBLIF(); // patterns for synthesis
     this->GeneratePLA();  // patterns for simulation
+}
+
+void Mgr::GenerateTestPatterns() {
+    /* Generates 100000 patterns for simulation, getting less than 10 errors would pass the baseline */
+    cout << "[  Mgr  ] Random sampling 100000 patterns for testing ..." << endl;
+    std::ofstream file; file.open("test_pat.txt");
+    file << _numInput << ' ' << 100000 << endl;
+    for (int i = 0; i < (int)_input.size(); ++i) {
+        file << _input[i]._name;
+        if (i < (int)_input.size()-1) file << ' ';
+    }
+    file << endl;
+    std::string newPat(_numInput, 'X');
+    for (int i = 0; i < 100000; ++i) {
+        Gen(newPat);
+        for (int bit = 0; bit < (int)newPat.length(); ++bit) {
+            file << newPat[bit];
+            if (bit < (int)newPat.length()-1) file << ' ';
+        }
+        file << endl;
+    }
+    file.close();
+
+    this->RunIOGen("test_pat.txt", "test_rel.txt");
+    this->ReadIORelation("test_rel.txt");
 }
 
 void Mgr::GenerateInputPattern(std::string filename) {

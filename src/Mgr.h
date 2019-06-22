@@ -53,17 +53,18 @@ public:
     void InitABC        ();
     void ReadABC        (const std::string filename = "pat.blif");
     void SynthesisABC   ();
-	void SimulateABC	(const std::string filename = "pat.pla");
+    void SimulateABC    (const std::string filename = "pat.pla");
     void TechMapABC     ();
+    void DumpVerilog    ();
     void EndABC         ();
 
     /********************/
     /* IO for gnenrator */
     /********************/
-    // random generate
+    void GenerateTestPatterns();
     void GenerateInputPattern(std::string filename = "in_pat.txt");
     void WritePattern        (const PatternBank&, std::string filename = "in_pat.txt") const;
-    void ReadIORelation      (std::string filename = "io_rel.txt");
+    void ReadIORelation      (std::string filename = "io_rel.txt", bool test = false);
     void RunIOGen            (std::string in_pat = "in_pat.txt", std::string io_rel = "io_rel.txt") const;
 
     void FindDependentInput();
@@ -91,15 +92,13 @@ private:
 
     std::vector<std::vector<VariableID> > _fanins; // _fanins[0] would be the fanins of output ID 0
 
-    // the initial number of patterns to do synthesis
-    int                    _initPatNum;
-
-    // the end index of the patterns for synthesis _relation_in[id][0] ~ _relation_in[id][_syn_end-1]
-    int                    _syn_end;
-
     std::vector<std::string> _relation_in;
     std::vector<std::string> _relation_out;
     int                      _numPat; // the total patterns in _relation_in/_relation_out
+
+    // this contains patterns for testing (the reference patterns)
+    std::vector<std::string> _test_in;
+    std::vector<std::string> _test_out;
 
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;

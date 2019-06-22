@@ -46,21 +46,29 @@ void Mgr::ReadIOGen(char* filename) {
     cout << "[ Parser] IO Generator: " << _iogen << endl;
 }
 
-void Mgr::ReadIORelation(std::string filename) {
+void Mgr::ReadIORelation(std::string filename, bool test) {
 
     cout << "[ Parser] Reading IO relation ..." << endl;
 
-    _relation_in.clear();
-    _relation_out.clear();
+    std::vector<std::string>& target_container_in = _relation_in;
+    std::vector<std::string>& target_container_out = _relation_out;
+
+    if (test) {
+        target_container_in = _test_in;
+        target_container_out = _test_out;
+    }
+
+    target_container_in.clear();
+    target_container_out.clear();
 
     int numRelation;
     std::ifstream file;
     file.open(filename.c_str());
     file >> numRelation >> numRelation >> numRelation;
-    _relation_in.resize(numRelation);
-    _relation_out.resize(numRelation);
-    for (int i = 0; i < (int)_relation_in.size(); ++i) _relation_in[i].resize((_numInput), 'X');
-    for (int i = 0; i < (int)_relation_out.size(); ++i) _relation_out[i].resize((_numOutput), 'X');
+    target_container_in.resize(numRelation);
+    target_container_out.resize(numRelation);
+    for (int i = 0; i < (int)target_container_in.size(); ++i) target_container_in[i].resize((_numInput), 'X');
+    for (int i = 0; i < (int)target_container_out.size(); ++i) target_container_out[i].resize((_numOutput), 'X');
 
     std::vector<std::string> variableNames;
     std::string buffer;
@@ -80,11 +88,11 @@ void Mgr::ReadIORelation(std::string filename) {
             if (it == _input_variable_name_id_map.end()) {
                 it = _output_variable_name_id_map.find(variableNames[bit]);
                 VariableID id = (*it).second;
-                _relation_out[relCount][id] = v;
+                target_container_out[relCount][id] = v;
             }
             else {
                 VariableID id = (*it).second;
-                _relation_in[relCount][id] = v;
+                target_container_in[relCount][id] = v;
             }
         }
         ++relCount;
