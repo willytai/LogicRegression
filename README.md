@@ -2,6 +2,14 @@
 
 ICCAD Problem A
 
+## Fix abc's Error On ICCAD's server!!!!!!
+
+* recompile the library with
+```
+make ABC_USE_NO_READLINE=1
+make libabc.a
+```
+
 ## 6/20 Presentation
 
 * perform resync once and do it level by level
