@@ -13,7 +13,7 @@ void Mgr::GenPattern() {
     this->RunIOGen();
     this->ReadIORelation();
     this->FindDependentInput();
-    this->Enumerate();
+    this->EnumerateAndSimulate();
     this->RunIOGen();
     this->ReadIORelation();
     this->GenerateBLIF(); // patterns for synthesis
@@ -42,7 +42,7 @@ void Mgr::GenerateTestPatterns() {
     file.close();
 
     this->RunIOGen("test_pat.txt", "test_rel.txt");
-    this->ReadIORelation("test_rel.txt");
+    this->ReadIORelation("test_rel.txt", true);
 }
 
 void Mgr::GenerateInputPattern(std::string filename) {
@@ -98,7 +98,10 @@ void Mgr::RunIOGen(std::string in_pat, std::string io_rel) const {
 void Mgr::FindDependentInput() {
     cout << "[  Mgr  ] Searching for dependent inputs for every output ..." << endl;
     // for every output, find the dependent input by the diff-by-1 patterns
-    _fanins.resize(_numOutput);
+    _fanin_mask.clear();
+    _fanin_mask.resize(_numOutput);
+    for (auto& val: _fanin_mask)  val.resize(_numInput, false);
+
     for (int pat_id = 0; pat_id < _numPat; pat_id += 2) {
         const std::string& in_pat_1 = _relation_in[pat_id];
         const std::string& in_pat_2 = _relation_in[pat_id+1];
@@ -108,174 +111,142 @@ void Mgr::FindDependentInput() {
             if (out_pat_1[PO_id] == out_pat_2[PO_id]) continue;
             for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
                 if (in_pat_1[PI_id] == in_pat_2[PI_id]) continue;
-                auto it = std::find(_fanins[PO_id].begin(), _fanins[PO_id].end(), PI_id);
-                if (it == _fanins[PO_id].end()) _fanins[PO_id].push_back(PI_id);
+                _fanin_mask[PO_id][PI_id] = true;
                 break;
             }
         }
     }
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-        cout << _output[PO_id]._name << "'s fanins(" << _fanins[PO_id].size() << "):";
-        for (int i = 0; i < (int)_fanins[PO_id].size(); ++i) cout << ' ' << _input[_fanins[PO_id][i]]._name;
+        cout << _output[PO_id]._name << "'s fanins(" << this->count(_fanin_mask[PO_id]) << "):";
+        for (int i = 0; i < (int)_fanin_mask[PO_id].size(); ++i) {
+            if (_fanin_mask[PO_id][i]) cout << ' ' << _input[i]._name;
+        }
         cout << endl;
     }
     cout << endl;
 }
 
-void Mgr::Enumerate() {
-    // this is for debugging
-    _few_fanin_mask.clear(); _few_fanin_mask.resize(_numOutput, false);
-    PatternBank patBank;
-    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-        int nDependent = _fanins[PO_id].size();
-        if (nDependent <= MAX_ENUMERATE_VAR_NUM) { // enumerate
-            for (int i = 0; i < (1 << nDependent); ++i) {
-                std::string newPat(_numInput, 'X');
-                for (int dep_id = 0; dep_id < nDependent; ++dep_id) {
-                    bool v = ( (i >> dep_id) & MASK );
-                    if (v) newPat[_fanins[PO_id][dep_id]] = '1';
-                    else   newPat[_fanins[PO_id][dep_id]] = '0';
-                }
-                for (int bit = 0; bit < (int)newPat.size(); ++bit) {
-                    if (newPat[bit] != 'X') continue;
-                    if (Gen(2)) newPat[bit] = '1';
-                    else        newPat[bit] = '0';
-                }
-                patBank.insert(newPat);
+void Mgr::EnumerateAndSimulate() {
+    std::vector<std::string> newPatterns;
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) this->Enumerate(newPatterns, PO_id);
+    this->WritePattern(newPatterns);
+    this->RunIOGen();
+    this->ReadIORelation();
+    this->Simulate();
+    cout << endl;
+}
+
+void Mgr::Enumerate(std::vector<std::string>& newPatterns, int PO_id) {
+    int nDependent = this->count(_fanin_mask[PO_id]);
+    if (nDependent <= MAX_ENUMERATE_VAR_NUM) { // enumerate
+        for (int i = 0; i < (1 << nDependent); ++i) {
+            std::string newPat(_numInput, '-');
+            int dep_id = 0;
+            for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+                bool v;
+                if (!_fanin_mask[PO_id][PI_id]) v = Gen(2);
+                else v = ( (i >> dep_id++) & MASK );
+                if (v) newPat[PI_id] = '1';
+                else   newPat[PI_id] = '0';
             }
-            _few_fanin_mask[PO_id] = true;
+            newPatterns.push_back(newPat);
         }
-        else { // primary outputs that conatin too many fanins are ignored for now
-            _few_fanin_mask[PO_id] = false;
+    }
+}
+
+void Mgr::Simulate() {
+    std::vector<bool> correct(_numOutput, false);
+    std::vector<size_t> t_in(_test_in.size(), 0x0);
+    std::vector<size_t> t_out(_test_out.size(), 0x0);
+    std::vector<size_t> r_in(_relation_in.size(), 0x0);
+    std::vector<size_t> r_out(_relation_out.size(), 0x0);
+    for (int test = 0; test < (int)_test_in.size(); ++test) {
+        for (int bit = 0; bit < (int)_test_in[test].length(); ++bit) {
+            t_in[test] = t_in[test] << 1;
+            if (_test_in[test][bit]) t_in[test] += 0x1;
+        }
+        for (int bit = 0; bit < (int)_test_out[test].length(); ++bit) {
+            t_out[test] = t_out[test] << 1;
+            if (_test_out[test][bit]) t_out[test] += 0x1;
+        }
+    }
+    for (int rel = 0; rel < (int)_relation_in.size(); ++rel) {
+        for (int bit = 0; bit < (int)_relation_in[rel].length(); ++bit) {
+            r_in[rel] = r_in[rel] << 1;
+            if (_relation_in[rel][bit]) r_in[rel] += 0x1;
+        }
+        for (int bit = 0; bit < (int)_relation_out[rel].length(); ++bit) {
+            r_out[rel] = r_out[rel] << 1;
+            if (_relation_out[rel][bit]) r_out[rel] += 0x1;
+        }
+    }
+
+    std::vector<size_t> ex_mask(_numOutput, 0x0);
+    std::vector<size_t> po_mask(_numOutput, 0x0);
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        po_mask[PO_id] += 1 << (_numOutput-1-PO_id);
+        if (this->count(_fanin_mask[PO_id]) > MAX_ENUMERATE_VAR_NUM) continue;
+        for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+            if (!_fanin_mask[PO_id][PI_id]) continue;
+            ex_mask[PO_id] += 0x1 << (_numInput-1-PI_id);
+        }
+        
+    }
+
+    std::vector<int> errors(_numOutput, 0);
+
+    for (int test = 0; test < (int)t_in.size(); ++test) {
+        size_t simulated = 0x0;
+        for (int rel = 0; rel < (int)r_in.size(); ++rel) {
+            size_t compare = t_in[test] ^ r_in[rel];
+            for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+                if (this->count(_fanin_mask[PO_id]) > MAX_ENUMERATE_VAR_NUM) continue;
+                size_t v = compare & ex_mask[PO_id];
+                if (!v) {
+                    simulated += 0x1 << (_numOutput-1-PO_id);
+                    size_t result = t_out[test] ^ r_out[rel];
+                    result &= po_mask[PO_id];
+                    if (result) {
+                        errors[PO_id] += 1;
+                    }
+                }
+            }
+            if (simulated == (1 << _numOutput) - 1) break;
+        }
+        if (simulated != (1 << _numOutput) - 1) {
+            for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+                if ( !( (simulated >> (_numOutput-1-PO_id)) & MASK) ) errors[PO_id] += 1;
+            }
         }
         cout << '\r' << std::flush;
-        cout << "[  Mgr  ] Enumerating patterns ... " << patBank.size() << " patterns enumearted." << std::flush;
+        cout << "[  Mgr  ] " << (test+1)*r_in.size() << " patterns simulated" << std::flush;
+        // cout << "[  Mgr  ] " << (test+1)*r_in.size() << " patterns simulated" << endl;
     }
-    this->WritePattern(patBank);
     cout << endl;
+    cout << "[  Mgr  ] Errors:" << endl;
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        cout << "                 " << _output[PO_id]._name << ": " << errors[PO_id] << endl;
+    }
+    exit(0);
 }
 
-/*
-void Mgr::CalInfoGain(const int PO_id, std::vector<std::pair<double, VariableID> >& info) {
-    cout << endl;
-    cout << "[  Mgr  ] Finding input variables with great information gain in terms of " << _output[PO_id]._name << endl;
-    assert(PO_id < (int)_output.size());
-
-    // calculate entropy for the corresponding output
-    const std::vector<Pat>& PO_pat = _relation_out[PO_id];
-    double PO_entropy, positive = 0.0, negative = 0.0;
-
-    for (int i = 0; i < (int)PO_pat.size(); ++i) {
-        for (int j = 0; j < UnitPatSize; ++j) {
-            if ( (PO_pat[i] >> j) & MASK ) ++positive;
-            else                           ++negative;
-        }
-    }
-    if (positive == 0.0) positive = std::numeric_limits<double>::min();
-    if (negative == 0.0) negative = std::numeric_limits<double>::min();
-    double tmp = positive + negative;
-    positive /= tmp;
-    negative /= tmp;
-    PO_entropy = -log2(positive)*positive - log2(negative)*negative;
-    // cout << _output[PO_id]._name << "'s entropy: " << PO_entropy << endl;
-
-    // calculate the information gain of each input
-    std::vector<std::pair<double, VariableID> > info_gain(_input.size());
-    for (int child_id = 0; child_id < (int)info_gain.size(); ++child_id) {
-        const std::vector<Pat>& PI_pat = _relation_in[child_id];
-        double p_child_p = 0.0, p_child_n = 0.0, n_child_p = 0.0, n_child_n = 0.0;
-        for (int pat_id = 0; pat_id < (int)PO_pat.size(); ++pat_id) {
-            for (int j = 0; j < UnitPatSize; ++j) {
-                if ( (PI_pat[pat_id] >> j) & MASK ) {
-                    if ( (PO_pat[pat_id] >> j) & MASK ) {
-                        ++p_child_p;
-                    }
-                    else {
-                        ++p_child_n;
-                    }
-                }
-                else {
-                    if ( (PO_pat[pat_id] >> j) & MASK ) {
-                        ++n_child_p;
-                    }
-                    else {
-                        ++n_child_n;
-                    }
-                }
-            }
-        }
-        double p_weight = (p_child_p + p_child_n) / (p_child_p + p_child_n + n_child_p + n_child_n);
-        double n_weight = (n_child_p + n_child_n) / (p_child_p + p_child_n + n_child_p + n_child_n);
-        if (p_child_p == 0.0) p_child_p = std::numeric_limits<double>::min();
-        if (p_child_n == 0.0) p_child_n = std::numeric_limits<double>::min();
-        if (n_child_p == 0.0) n_child_p = std::numeric_limits<double>::min();
-        if (n_child_n == 0.0) n_child_n = std::numeric_limits<double>::min();
-        tmp = p_child_p + p_child_n;
-        p_child_p /= tmp;
-        p_child_n /= tmp;
-        tmp = n_child_p + n_child_n;
-        n_child_p /= tmp;
-        n_child_n /= tmp;
-        double p_entropy = -log2(p_child_p)*p_child_p - log2(p_child_n)*p_child_n;
-        double n_entropy = -log2(n_child_p)*n_child_p - log2(n_child_n)*n_child_n;
-        double gain      = PO_entropy - p_weight*p_entropy - n_weight*n_entropy;
-        info_gain[child_id] = std::pair<double, VariableID>(gain, child_id);
-    }
-
-    // sort in descending order
-    std::sort(info_gain.begin(), info_gain.end(), std::greater<std::pair<double, VariableID> >());
-    info.swap(info_gain);
-}
-
-void Mgr::refinePattern
-(PatternBank& patBank, const std::vector<std::pair<double, VariableID> >& info) {
-
-    // for visualization
-    int old = patBank.size();
-
-    // find best partition
-    int partition_index = info.size();
-    while (partition_index == (int)info.size() || partition_index >= MAX_ENUMERATE_VAR_NUM) {
-        int limit = partition_index;
-        double margin = 0.0;
-        for (int i = 0; i < limit-1; ++i) {
-            double curMargin = info[i].first - info[i+1].first;
-            if (curMargin > margin) {
-                margin = curMargin;
-                partition_index = i+1;
-            }
-        }
-    }
-    if (partition_index < MIN_ENUMERATE_VAR_NUM) partition_index = MIN_ENUMERATE_VAR_NUM;
-    cout << "[  Mgr  ] Number of chosen input variables: " << partition_index << endl;
-    cout << "[  Mgr  ] Enumerating and combining patterns ..." << endl;
-
-    const int& chosenVarNum = partition_index;
-    for (int i = 0; i < ( 1 << chosenVarNum ); ++i) {
-        std::string pattern(_numInput, 'X');
-        int patternKey = 0;
-        for (int j = 0; j < chosenVarNum; ++j) {
-            bool   tmp = ( ( i >> j ) & MASK );
-            int in_id  = info[partition_index-1-j].second;
-            pattern[in_id] = ( tmp ? '1' : '0' );
-            patternKey += tmp;
-        }
-        patBank.insert(pattern);
-    }
-    cout << "[  Mgr  ] " << patBank.size()-old << " additional base patterns generated." << endl;
-}
-*/
-
-void Mgr::WritePattern(const PatternBank& patBank, std::string filename) const {
+void Mgr::WritePattern(const std::vector<std::string>& newPatterns, std::string filename) const {
+    cout << "[  Mgr  ] Writing " << newPatterns.size() << " patterns to " << filename << endl;
     std::ofstream file;
     file.open(filename.c_str());
-    file << _numInput << ' ' << patBank.size() << endl;
+    file << _numInput << ' ' << newPatterns.size() << endl;
     for (int i = 0; i < _numInput; ++i) {
         file << _input[i]._name;
         if (i < _numInput-1) file << ' ';
     }
     file << endl;
-    patBank.WritePattern(file);
+    for (const auto& pat: newPatterns) {
+        for (int i = 0; i < (int)pat.length(); ++i) {
+            file << pat[i];
+            if (i < (int)pat.length()-1) file << ' ';
+        }
+        file << endl;
+    }
 }
 
 /* end of namespace */

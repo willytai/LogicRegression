@@ -63,14 +63,15 @@ public:
     /********************/
     void GenerateTestPatterns();
     void GenerateInputPattern(std::string filename = "in_pat.txt");
-    void WritePattern        (const PatternBank&, std::string filename = "in_pat.txt") const;
+    void WritePattern        (const std::vector<std::string>&, std::string filename = "in_pat.txt") const;
     void ReadIORelation      (std::string filename = "io_rel.txt", bool test = false);
+    void ReadIORelation      (std::string filename, std::vector<std::string>&, std::vector<std::string>&);
     void RunIOGen            (std::string in_pat = "in_pat.txt", std::string io_rel = "io_rel.txt") const;
 
     void FindDependentInput();
-    void Enumerate();
-    // void CalInfoGain(const int, std::vector<std::pair<double, VariableID> >&);
-    // void refinePattern(PatternBank&, const std::vector<std::pair<double, VariableID> >&);
+    void EnumerateAndSimulate();
+    void Enumerate(std::vector<std::string>&, int);
+    void Simulate();
 
     // Generate PLA file for abc
     void GeneratePLA (std::string filename = "pat.pla");
@@ -81,6 +82,15 @@ public:
     void Merge(std::string&, const std::string&);
     bool DiffByOne(const std::string&, const std::string&);
 
+    // some useful method
+    inline int count(const std::vector<bool> v) {
+        int count = 0;
+        for (const auto& val: v) {
+            if (val) ++count;
+        }
+        return count;
+    }
+
 private:
     std::string            _benchmark;
     std::vector<Variable>  _input;
@@ -89,8 +99,6 @@ private:
     int                    _numInput;
     int                    _numOutput;
     char*                  _verilog_output;
-
-    std::vector<std::vector<VariableID> > _fanins; // _fanins[0] would be the fanins of output ID 0
 
     std::vector<std::string> _relation_in;
     std::vector<std::string> _relation_out;
@@ -103,8 +111,8 @@ private:
     std::map<std::string, VariableID>  _input_variable_name_id_map;
     std::map<std::string, VariableID>  _output_variable_name_id_map;
 
-    // this is just for debugging
-    std::vector<bool>        _few_fanin_mask;
+    // dependent inputs
+    std::vector<std::vector<bool> >        _fanin_mask;
 
     // ABC frame work
     inline void AbcError(const char* command) {

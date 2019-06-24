@@ -47,16 +47,13 @@ void Mgr::ReadIOGen(char* filename) {
 }
 
 void Mgr::ReadIORelation(std::string filename, bool test) {
+    if (test) this->ReadIORelation(filename, _test_in, _test_out);
+    else      this->ReadIORelation(filename, _relation_in, _relation_out);
+}
+
+void Mgr::ReadIORelation(std::string filename, std::vector<std::string>& target_container_in, std::vector<std::string>& target_container_out) {
 
     cout << "[ Parser] Reading IO relation ..." << endl;
-
-    std::vector<std::string>& target_container_in = _relation_in;
-    std::vector<std::string>& target_container_out = _relation_out;
-
-    if (test) {
-        target_container_in = _test_in;
-        target_container_out = _test_out;
-    }
 
     target_container_in.clear();
     target_container_out.clear();

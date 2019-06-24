@@ -20,13 +20,13 @@ void Mgr::GenerateBLIF(std::string filename) {
     /* output variable names in order */
     blifFile << ".outputs";
     for (int i = 0; i < _numOutput; ++i) {
-        if (!_few_fanin_mask[i]) continue;
+        // if (!_few_fanin_mask[i]) continue;
         blifFile << ' ' << _output[i]._name;
     }
     blifFile << endl;
 
     for (int i = 0; i < _numOutput; ++i) {
-        if (!_few_fanin_mask[i]) continue;
+        // if (!_few_fanin_mask[i]) continue;
         std::vector<std::string> patterns;
         this->CollectOnSetPatterns(patterns, i);
         if (patterns.size()) {
@@ -53,17 +53,11 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
     }
     for (int pat_id = 0; pat_id < (int)patterns.size(); ++pat_id) {
         for (int bit = 0; bit < (int)patterns[pat_id].size(); ++bit) {
-            bool check = false;
-            for (int i = 0; i < (int)_fanins[PO_id].size(); ++i) {
-                if (_fanins[PO_id][i] == bit) {
-                    check = true;
-                    break;
-                }
-            }
-            if (!check) patterns[pat_id][bit] = '-';
+            if (!_fanin_mask[PO_id][bit]) patterns[pat_id][bit] = '-';
         }
     }
 
+    /*
     // merge patterns that only differ by 1 bit
     // repeat until no merges can be found
     while (true) {
@@ -81,6 +75,7 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
         }
         if (!test) break;
     }
+    */
 }
 
 void Mgr::Merge(std::string& base, const std::string& candidate) {
