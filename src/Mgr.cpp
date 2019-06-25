@@ -22,9 +22,9 @@ void Mgr::GenPattern() {
 
 void Mgr::GenerateTestPatterns() {
     /* Generates 100000 patterns for simulation, getting less than 10 errors would pass the baseline */
-    cout << "[  Mgr  ] Random sampling 100000 patterns for testing ..." << endl;
+    cout << "[  Mgr  ] Random sampling " << 100000+2+2*_numInput << " patterns for testing ..." << endl;
     std::ofstream file; file.open("test_pat.txt");
-    file << _numInput << ' ' << 100000 << endl;
+    file << _numInput << ' ' << 100000+2+2*_numInput << endl;
     for (int i = 0; i < (int)_input.size(); ++i) {
         file << _input[i]._name;
         if (i < (int)_input.size()-1) file << ' ';
@@ -36,6 +36,31 @@ void Mgr::GenerateTestPatterns() {
         for (int bit = 0; bit < (int)newPat.length(); ++bit) {
             file << newPat[bit];
             if (bit < (int)newPat.length()-1) file << ' ';
+        }
+        file << endl;
+    }
+    for (int bit = 0; bit < _numInput; ++bit) {
+        file << '1';
+        if (bit < _numInput-1) file << ' ';
+    }
+    file << endl;
+    for (int bit = 0; bit < _numInput; ++bit) {
+        file << '0';
+        if (bit < _numInput-1) file << ' ';
+    }
+    file << endl;
+    for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+        // some special patterns
+        for (int bit = 0; bit < _numInput; ++bit) {
+            if (bit == PI_id) file << '0';
+            else              file << '1';
+            if (bit < _numInput-1) file << ' ';
+        }
+        file << endl;
+        for (int bit = 0; bit < _numInput; ++bit) {
+            if (bit == PI_id) file << '1';
+            else              file << '0';
+            if (bit < _numInput-1) file << ' ';
         }
         file << endl;
     }
