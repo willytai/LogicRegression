@@ -50,7 +50,7 @@ void Mgr::GenerateInputPattern(std::string filename) {
     // 0000000 0000000
     // 1000000 0100000
     int fixPat = log2(_numInput-1) * 100;
-    int numPat = 2 * _numInput * fixPat;
+    int numPat = 4 * _numInput + 2 * _numInput * fixPat;
     cout << "[  Mgr  ] Generating " << numPat << " patterns that differ by one bit ..." << endl;
     std::ofstream file;
     file.open(filename.c_str());
@@ -68,6 +68,30 @@ void Mgr::GenerateInputPattern(std::string filename) {
     file << endl;
 
     for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+        // some special patterns
+        for (int bit = 0; bit < _numInput; ++bit) {
+            file << '1';
+            if (bit < _numInput-1) file << ' ';
+        }
+        file << endl;
+        for (int bit = 0; bit < _numInput; ++bit) {
+            if (bit == PI_id) file << '0';
+            else              file << '1';
+            if (bit < _numInput-1) file << ' ';
+        }
+        file << endl;
+        for (int bit = 0; bit < _numInput; ++bit) {
+            file << '0';
+            if (bit < _numInput-1) file << ' ';
+        }
+        file << endl;
+        for (int bit = 0; bit < _numInput; ++bit) {
+            if (bit == PI_id) file << '1';
+            else              file << '0';
+            if (bit < _numInput-1) file << ' ';
+        }
+        file << endl;
+
         for (int i = 0; i < fixPat; ++i) {
             std::string pat(_numInput, 'X');
             Gen(pat);
@@ -155,78 +179,60 @@ void Mgr::Enumerate(std::vector<std::string>& newPatterns, int PO_id) {
 }
 
 void Mgr::Simulate() {
-    std::vector<bool> correct(_numOutput, false);
-    std::vector<size_t> t_in(_test_in.size(), 0x0);
-    std::vector<size_t> t_out(_test_out.size(), 0x0);
-    std::vector<size_t> r_in(_relation_in.size(), 0x0);
-    std::vector<size_t> r_out(_relation_out.size(), 0x0);
-    for (int test = 0; test < (int)_test_in.size(); ++test) {
-        for (int bit = 0; bit < (int)_test_in[test].length(); ++bit) {
-            t_in[test] = t_in[test] << 1;
-            if (_test_in[test][bit]) t_in[test] += 0x1;
-        }
-        for (int bit = 0; bit < (int)_test_out[test].length(); ++bit) {
-            t_out[test] = t_out[test] << 1;
-            if (_test_out[test][bit]) t_out[test] += 0x1;
-        }
-    }
-    for (int rel = 0; rel < (int)_relation_in.size(); ++rel) {
-        for (int bit = 0; bit < (int)_relation_in[rel].length(); ++bit) {
-            r_in[rel] = r_in[rel] << 1;
-            if (_relation_in[rel][bit]) r_in[rel] += 0x1;
-        }
-        for (int bit = 0; bit < (int)_relation_out[rel].length(); ++bit) {
-            r_out[rel] = r_out[rel] << 1;
-            if (_relation_out[rel][bit]) r_out[rel] += 0x1;
-        }
-    }
-
-    std::vector<size_t> ex_mask(_numOutput, 0x0);
-    std::vector<size_t> po_mask(_numOutput, 0x0);
-    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-        po_mask[PO_id] += 1 << (_numOutput-1-PO_id);
-        if (this->count(_fanin_mask[PO_id]) > MAX_ENUMERATE_VAR_NUM) continue;
-        for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
-            if (!_fanin_mask[PO_id][PI_id]) continue;
-            ex_mask[PO_id] += 0x1 << (_numInput-1-PI_id);
-        }
-        
-    }
-
     std::vector<int> errors(_numOutput, 0);
 
-    for (int test = 0; test < (int)t_in.size(); ++test) {
-        size_t simulated = 0x0;
-        for (int rel = 0; rel < (int)r_in.size(); ++rel) {
-            size_t compare = t_in[test] ^ r_in[rel];
-            for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-                if (this->count(_fanin_mask[PO_id]) > MAX_ENUMERATE_VAR_NUM) continue;
-                size_t v = compare & ex_mask[PO_id];
-                if (!v) {
-                    simulated += 0x1 << (_numOutput-1-PO_id);
-                    size_t result = t_out[test] ^ r_out[rel];
-                    result &= po_mask[PO_id];
-                    if (result) {
-                        errors[PO_id] += 1;
-                    }
-                }
+    // create a hash to store results of outputs
+    bool **table = new bool*[_numOutput];
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        int c = this->count(_fanin_mask[PO_id]);
+        if (0 < c && c <= MAX_ENUMERATE_VAR_NUM) table[PO_id] = new bool[(1 << c)];
+        else if (!c)                             table[PO_id] = new bool[1];
+        else                                     table[PO_id] = NULL;
+    }
+
+    for (int pat_id = 0; pat_id < (int)_relation_in.size(); ++pat_id) {
+        const std::string& rel_in = _relation_in[pat_id];
+        const std::string& rel_out = _relation_out[pat_id];
+        for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+            if (!table[PO_id]) continue;
+            size_t key = 0x0;
+            for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+                if (!_fanin_mask[PO_id][PI_id]) continue;
+                key = key << 1;
+                key += (rel_in[PI_id] == '1' ? 0x1 : 0x0);
             }
-            if (simulated == (1 << _numOutput) - 1) break;
+            table[PO_id][key] = (rel_out[PO_id] == '1' ? true : false);
         }
-        if (simulated != (1 << _numOutput) - 1) {
-            for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-                if ( !( (simulated >> (_numOutput-1-PO_id)) & MASK) ) errors[PO_id] += 1;
+    }
+
+    for (int test_id = 0; test_id < (int)_test_in.size(); ++test_id) {
+        const std::string& t_in = _test_in[test_id];
+        const std::string& t_out = _test_out[test_id];
+        for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+            if (!table[PO_id]) continue;
+            size_t key = 0x0;
+            for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
+                if (!_fanin_mask[PO_id][PI_id]) continue;
+                key = key << 1;
+                key += (t_in[PI_id] == '1' ? 0x1 : 0x0);
             }
+            bool ground_truth = (t_out[PO_id] == '1' ? true : false);
+            if (ground_truth != table[PO_id][key]) errors[PO_id] += 1;
         }
         cout << '\r' << std::flush;
-        cout << "[  Mgr  ] " << (test+1)*r_in.size() << " patterns simulated" << std::flush;
-        // cout << "[  Mgr  ] " << (test+1)*r_in.size() << " patterns simulated" << endl;
+        cout << "[  Mgr  ] " << test_id+1 << " patterns simulated." << std::flush;
     }
+
     cout << endl;
     cout << "[  Mgr  ] Errors:" << endl;
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
         cout << "                 " << _output[PO_id]._name << ": " << errors[PO_id] << endl;
     }
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        if (table[PO_id]) delete table[PO_id];
+    }
+    delete [] table;
+    usg.report(1,1);
     exit(0);
 }
 

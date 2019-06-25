@@ -22,7 +22,7 @@ GATE XNOR 1  Y = !( ( A * !B ) + ( !A * B ) );
   PIN A NONINV 0 0 0 0 0 0
   PIN B NONINV 0 0 0 0 0 0
 
-GATE INV 0  Y = !A;
+GATE inv 0  Y = !A;
   PIN A NONINV 0 0 0 0 0 0
 
 GATE BUF 0 Y = A;
