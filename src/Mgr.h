@@ -78,7 +78,7 @@ public:
 
     // Generate BLIF file for abc
     void GenerateBLIF(std::string filename = "pat.blif");
-    void CollectOnSetPatterns(std::vector<std::string>&, const int&); // duplicates are removed here
+    void CollectPatterns(std::vector<std::string>&, const int&); // duplicates are removed here
     void Merge(std::string&, const std::string&);
     bool DiffByOne(const std::string&, const std::string&);
 
@@ -102,7 +102,9 @@ private:
 
     std::vector<std::string> _relation_in;
     std::vector<std::string> _relation_out;
-    int                      _numPat; // the total patterns in _relation_in/_relation_out
+
+    // the extra patterns for too many inputs' output
+    std::vector<std::string> _extra_in, _extra_out;
 
     // this contains patterns for testing (the reference patterns)
     std::vector<std::string> _test_in;
@@ -113,6 +115,9 @@ private:
 
     // dependent inputs
     std::vector<std::vector<bool> >        _fanin_mask;
+
+    // whether to specify onset or offset in BLIF
+    std::vector<bool>                      _onset_mask;
 
     // ABC frame work
     inline void AbcError(const char* command) {

@@ -44,7 +44,6 @@ void Mgr::RunAbc() {
     this->InitABC();
     this->ReadABC();
     this->SynthesisABC();
-    this->SimulateABC();
     this->TechMapABC();
     this->DumpVerilog();
     this->EndABC();
@@ -245,9 +244,4 @@ void Mgr::EndABC(){
 }
 
 }
-
-
-
-
-
 

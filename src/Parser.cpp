@@ -94,7 +94,6 @@ void Mgr::ReadIORelation(std::string filename, std::vector<std::string>& target_
         }
         ++relCount;
     }
-    _numPat = numRelation;
 }
 
 }

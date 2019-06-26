@@ -14,10 +14,7 @@ void Mgr::GenPattern() {
     this->ReadIORelation();
     this->FindDependentInput();
     this->EnumerateAndSimulate();
-    this->RunIOGen();
-    this->ReadIORelation();
     this->GenerateBLIF(); // patterns for synthesis
-    this->GeneratePLA();  // patterns for simulation
 }
 
 void Mgr::GenerateTestPatterns() {
@@ -151,7 +148,7 @@ void Mgr::FindDependentInput() {
     _fanin_mask.resize(_numOutput);
     for (auto& val: _fanin_mask)  val.resize(_numInput, false);
 
-    for (int pat_id = 0; pat_id < _numPat; pat_id += 2) {
+    for (int pat_id = 0; pat_id < (int)_relation_in.size(); pat_id += 2) {
         const std::string& in_pat_1 = _relation_in[pat_id];
         const std::string& in_pat_2 = _relation_in[pat_id+1];
         const std::string& out_pat_1 = _relation_out[pat_id];
@@ -165,14 +162,6 @@ void Mgr::FindDependentInput() {
             }
         }
     }
-    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-        cout << _output[PO_id]._name << "'s fanins(" << this->count(_fanin_mask[PO_id]) << "):";
-        for (int i = 0; i < (int)_fanin_mask[PO_id].size(); ++i) {
-            if (_fanin_mask[PO_id][i]) cout << ' ' << _input[i]._name;
-        }
-        cout << endl;
-    }
-    cout << endl;
 }
 
 void Mgr::EnumerateAndSimulate() {
@@ -182,7 +171,6 @@ void Mgr::EnumerateAndSimulate() {
     this->RunIOGen();
     this->ReadIORelation();
     this->Simulate();
-    cout << endl;
 }
 
 void Mgr::Enumerate(std::vector<std::string>& newPatterns, int PO_id) {
@@ -201,40 +189,58 @@ void Mgr::Enumerate(std::vector<std::string>& newPatterns, int PO_id) {
             newPatterns.push_back(newPat);
         }
     }
+    else { // sample a max number of patterns
+        for (int i = 0; i < (1 << MAX_ENUMERATE_VAR_NUM); ++i) {
+            std::string newPat(_numInput, '-');
+            Gen(newPat);
+            newPatterns.push_back(newPat);
+        }
+    }
 }
 
 void Mgr::Simulate() {
     std::vector<int> errors(_numOutput, 0);
 
     // create a hash to store results of outputs
+    // use map to store outputs with too many inputs
     bool **table = new bool*[_numOutput];
+    std::map<size_t, bool> **m_table = new std::map<size_t, bool>*[_numOutput];
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
         int c = this->count(_fanin_mask[PO_id]);
-        if (0 < c && c <= MAX_ENUMERATE_VAR_NUM) table[PO_id] = new bool[(1 << c)];
-        else if (!c)                             table[PO_id] = new bool[1];
-        else                                     table[PO_id] = NULL;
+        if (0 < c && c <= MAX_ENUMERATE_VAR_NUM) {
+            table[PO_id] = new bool[(1 << c)];
+            m_table[PO_id] = NULL;
+        }
+        else if (!c) {
+            table[PO_id] = new bool[1];
+            m_table[PO_id] = NULL;
+        }
+        else {
+            table[PO_id] = NULL;
+            m_table[PO_id] = new std::map<size_t, bool>();
+        }
     }
 
     for (int pat_id = 0; pat_id < (int)_relation_in.size(); ++pat_id) {
         const std::string& rel_in = _relation_in[pat_id];
         const std::string& rel_out = _relation_out[pat_id];
         for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-            if (!table[PO_id]) continue;
             size_t key = 0x0;
             for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
                 if (!_fanin_mask[PO_id][PI_id]) continue;
                 key = key << 1;
                 key += (rel_in[PI_id] == '1' ? 0x1 : 0x0);
             }
-            table[PO_id][key] = (rel_out[PO_id] == '1' ? true : false);
+            if (table[PO_id]) table[PO_id][key] = (rel_out[PO_id] == '1' ? true : false);
+            else              m_table[PO_id]->operator[](key) = (rel_out[PO_id] == '1' ? true : false);
         }
     }
 
+    std::vector<int> onset_offset_diff(_numOutput, 0); // distance between onset patterns and offset patterns
     for (int test_id = 0; test_id < (int)_test_in.size(); ++test_id) {
         const std::string& t_in = _test_in[test_id];
         const std::string& t_out = _test_out[test_id];
         for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-            if (!table[PO_id]) continue;
             size_t key = 0x0;
             for (int PI_id = 0; PI_id < _numInput; ++PI_id) {
                 if (!_fanin_mask[PO_id][PI_id]) continue;
@@ -242,23 +248,46 @@ void Mgr::Simulate() {
                 key += (t_in[PI_id] == '1' ? 0x1 : 0x0);
             }
             bool ground_truth = (t_out[PO_id] == '1' ? true : false);
-            if (ground_truth != table[PO_id][key]) errors[PO_id] += 1;
+            if (ground_truth) onset_offset_diff[PO_id] += 1;
+            else              onset_offset_diff[PO_id] -= 1;
+            if (table[PO_id] != NULL) {
+                if (ground_truth != table[PO_id][key]) errors[PO_id] += 1;
+            }
+            else {
+                auto it = m_table[PO_id]->find(key);
+                if (it == m_table[PO_id]->end()) {
+                    _extra_in.push_back(t_in);
+                    _extra_out.push_back(t_out);
+                }
+                else {
+                    if (ground_truth != (*it).second) errors[PO_id] += 1;
+                }
+            }
         }
         cout << '\r' << std::flush;
         cout << "[  Mgr  ] " << test_id+1 << " patterns simulated." << std::flush;
     }
 
+    // set _onset_mask
+    _onset_mask.clear(); _onset_mask.resize(_numOutput, true);
+    for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
+        if (this->count(_fanin_mask[PO_id]) <= MAX_ENUMERATE_VAR_NUM) continue;
+        if (onset_offset_diff[PO_id] > 0) _onset_mask[PO_id] = false;
+    }
+
     cout << endl;
     cout << "[  Mgr  ] Errors:" << endl;
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
-        cout << "                 " << _output[PO_id]._name << ": " << errors[PO_id] << endl;
+        cout << "                 " << _output[PO_id]._name << "(" << std::left << std::setw(2) << this->count(_fanin_mask[PO_id]) << " fanins): ";
+        cout << std::left << std::setw(4) << errors[PO_id] << '\t';
+        cout << "onset - offset: " << onset_offset_diff[PO_id] << endl;
     }
     for (int PO_id = 0; PO_id < _numOutput; ++PO_id) {
         if (table[PO_id]) delete table[PO_id];
+        if (m_table[PO_id]) delete m_table[PO_id];
     }
     delete [] table;
-    usg.report(1,1);
-    exit(0);
+    delete [] m_table;
 }
 
 void Mgr::WritePattern(const std::vector<std::string>& newPatterns, std::string filename) const {

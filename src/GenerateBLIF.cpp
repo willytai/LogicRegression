@@ -4,10 +4,9 @@ namespace LogicRegression
 {
 
 void Mgr::GenerateBLIF(std::string filename) {
-    cout << "[  Mgr  ] creating BLIF file from random pattern ..." << endl;
+    cout << "[  Mgr  ] creating BLIF file ..." << endl;
     std::ofstream blifFile;
     blifFile.open(filename.c_str());
-    // blifFile << ".model ICCAD:" << _benchmark << endl;
     blifFile << ".model top" << endl;
 
     /* input variable names in order */
@@ -20,36 +19,47 @@ void Mgr::GenerateBLIF(std::string filename) {
     /* output variable names in order */
     blifFile << ".outputs";
     for (int i = 0; i < _numOutput; ++i) {
-        // if (!_few_fanin_mask[i]) continue;
         blifFile << ' ' << _output[i]._name;
     }
     blifFile << endl;
 
     for (int i = 0; i < _numOutput; ++i) {
-        // if (!_few_fanin_mask[i]) continue;
+        char refset = (_onset_mask[i] ? '1' : '0');
         std::vector<std::string> patterns;
-        this->CollectOnSetPatterns(patterns, i);
+        this->CollectPatterns(patterns, i);
         if (patterns.size()) {
             blifFile << ".names";
             for (int j = 0; j < _numInput; ++j) blifFile << ' ' << _input[j]._name;
             blifFile << ' ' << _output[i]._name << endl;
-            for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << 1 << endl;
+            for (int j = 0; j < (int)patterns.size(); ++j) blifFile << patterns[j] << ' ' << refset << endl;
         }
         else {
             blifFile << ".names " << _output[i]._name << endl;
+            if (refset == '1') blifFile << '1' << endl;
+            cout << "[  BLIF ] Warning: " << _output[i]._name << " specified as constant " << refset << endl;
         }
     }
     blifFile << ".end" << endl;
     cout << "[  Mgr  ] Finished writing BLIF file." << endl;
 }
 
-void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO_id) {
-    cout << "[  Mgr  ] Collecting and merging onset patterns for " << _output[PO_id]._name << " ..." << endl;
+void Mgr::CollectPatterns(std::vector<std::string>& patterns, const int& PO_id) {
+
+    if (this->count(_fanin_mask[PO_id]) == 0) return;
+
+    char refset = (_onset_mask[PO_id] ? '1' : '0');
 
     // collect patterns
-    for (int pat_id = 0; pat_id < _numPat; ++pat_id) {
-        if (_relation_out[pat_id][PO_id] == '0') continue;
+    for (int pat_id = 0; pat_id < (int)_relation_in.size(); ++pat_id) {
+        if (_relation_out[pat_id][PO_id] != refset) continue;
         else patterns.push_back(_relation_in[pat_id]);
+    }
+    // collect the extra patterns if it is the too many inputs' output
+    if (this->count(_fanin_mask[PO_id]) > MAX_ENUMERATE_VAR_NUM) {
+        for (int pat_id = 0; pat_id < (int)_extra_in.size(); ++pat_id) {
+            if (_extra_out[pat_id][PO_id] != refset) continue;
+            else patterns.push_back(_extra_in[pat_id]);
+        }
     }
     for (int pat_id = 0; pat_id < (int)patterns.size(); ++pat_id) {
         for (int bit = 0; bit < (int)patterns[pat_id].size(); ++bit) {
@@ -57,7 +67,7 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
         }
     }
 
-    /*
+    /* this seems too costly by now
     // merge patterns that only differ by 1 bit
     // repeat until no merges can be found
     while (true) {
@@ -73,8 +83,11 @@ void Mgr::CollectOnSetPatterns(std::vector<std::string>& patterns, const int& PO
                 }
             }
         }
+        cout << '\r' << std::flush;
+        cout << "[  Mgr  ] Collecting and merging patterns for " << _output[PO_id]._name << " ... " << std::right << std::setw(6) << test << std::flush;
         if (!test) break;
     }
+    cout << endl;
     */
 }
 
